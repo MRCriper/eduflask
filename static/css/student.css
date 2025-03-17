@@ -1,0 +1,147 @@
+.calendar .cal-img {
+    width: 48px;
+    height: 48px;
+    position: fixed;
+    left: 5px;
+    top: 5px;
+    cursor: pointer;
+}
+
+.notification .not-img {
+    width: 32px;
+    height: 32px;
+    position: fixed;
+    right: 63px;
+    top: 13px;
+    cursor: pointer;
+    display: block;
+    align-items: center;
+}
+
+.account .acc-img{
+    width: 48px;
+    height: 48px;
+    position: fixed;
+    right: 5px;
+    top: 5px;
+    cursor: pointer;
+}
+
+.header {
+    text-align: center;
+    display: inline;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.common {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 95%;
+    height: 75vh;
+    justify-content: end;
+    align-items: center;
+}
+
+.acc-img:hover {
+    top: 7px;
+}
+
+.acc-img:active {
+    top: 5px;
+}
+
+/* form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+} */
+
+form {
+    position: relative; /* Добавляем контекст позиционирования */
+    width: 16vw; /* Совпадает с шириной поля ввода */
+}
+
+
+.request {
+    /* width: 16vw; */
+    width: 100%; /* Занимает всю ширину формы */
+    height: 32px;
+    border-radius: 20px;
+    background-color: aquamarine;
+    border: none;
+    margin: 5px;
+    flex: 0 0 auto;
+}
+
+.request:focus {
+    border: none;
+    outline: none;
+}
+
+/* .response {
+    border: white 5px;
+    outline: 6px;
+    height: 100px;
+    width: 50px;
+} */
+
+.response {
+    min-height: 150px;
+    flex: 1;
+    width: 90%;
+    background-color: rgba(255, 255, 255, 0.9); /* Фон */
+    border-radius: 10px; /* Скругление углов */
+    padding: 15px; /* Отступы внутри */
+    color: #000; /* Цвет текста */
+    overflow-y: auto; /* Прокрутка, если контента много */
+    margin-bottom: 20px; /* Отступ снизу */
+    font-size: 24px;
+}
+
+.send {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.send-img {
+    width: 24px;
+    height: 24px;
+}
+
+.placeholder-text {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+}
+
+.hint-img {
+    width: 24px;
+    height: 24px;
+}
+
+.hint {
+    position: fixed;
+    left: 0;
+    z-index: 1;
+}

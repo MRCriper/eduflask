@@ -1,0 +1,19 @@
+body {
+    background-color: rgb(0, 0, 177);
+    color: rgb(149, 177, 255);
+    margin: 0;
+}
+
+
+.footer {
+    display: flex;
+    justify-content: center;
+}
+
+.response {
+    transition: opacity 0.3s ease;
+}
+
+.response.loading {
+    opacity: 0.5;
+}
