@@ -5,27 +5,31 @@ from importlib import import_module
 safe_builtins['import'] = import_module
 np = import_module('numpy')
 print(np.pi)
-# client = OpenAI(
-#   base_url="https://openrouter.ai/api/v1",
-#   api_key="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",
-# )
+client = OpenAI(
+  base_url="https://api.intelligence.io.solutions/api/v1/chat/completions",
+  api_key="io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6IjA0MDg5YzgwLTY1ZDUtNGViNS1hNmE3LWQ1NDYzNzFiOWNmMyIsImV4cCI6NDg5NTkxODA3N30.cpjpRsQSoTzCdIXZELNzATjc2eO9ns93EfWFfX4Jxj4IFM7DBHbGIhqmL7lvs6FtQLJR0SmLxD4zU_ndBVFpUw",
+)
 
-# completion = client.chat.completions.create(
-#   extra_body={},
-#   model="google/gemini-2.0-pro-exp-02-05:free",
-#   messages=[
-#     {
-#       "role": "user",
-#       "content": [
-#         {
-#           "type": "text",
-#           "text": "Сгенерируй задачу по Физика для 10 класс. Задача должна включать текстовое условие и, если необходимо, рисунок или схему. Ответ представь в виде python-кода. HTML-код должен быть структурирован следующим образом:  Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>). Для генерации изображений используй библиотеки для создания графики (matplotlib для Python).  Дополнительные пояснения или подсказки (если нужны) в виде текста (тег <p>).  Пример ожидаемого формата:  <h3>Задача по математике для 7 класса</h3> <p>Условие задачи: В прямоугольном треугольнике ABC катеты AB и BC равны 6 см и 8 см соответственно. Найдите длину гипотенузы AC.</p> <img alt='Рисунок треугольника'> <p>Подсказка: Используйте теорему Пифагора.</p>  Пожалуйста, убедись, что python-код сохраняет готовый html-код  в переменную html_output(переменная должна называться именно так), корректен и готов к выполнению."
-#         },
-#       ]
-#     }
-#   ]
-# )
-# print(completion.choices[0].message.content)
+completion = client.chat.completions.create(
+  extra_body={},
+  model="meta-llama/Llama-3.2-90B-Vision-Instruct",
+  messages=[
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Сгенерируй задачу по Физика для 10 класс. Задача должна включать текстовое условие и, если необходимо, рисунок или схему. Ответ представь в виде python-кода. HTML-код должен быть структурирован следующим образом:  Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>). Для генерации изображений используй библиотеки для создания графики (matplotlib для Python).  Дополнительные пояснения или подсказки (если нужны) в виде текста (тег <p>).  Пример ожидаемого формата:  <h3>Задача по математике для 7 класса</h3> <p>Условие задачи: В прямоугольном треугольнике ABC катеты AB и BC равны 6 см и 8 см соответственно. Найдите длину гипотенузы AC.</p> <img alt='Рисунок треугольника'> <p>Подсказка: Используйте теорему Пифагора.</p>  Пожалуйста, убедись, что python-код сохраняет готовый html-код  в переменную html_output(переменная должна называться именно так), корректен и готов к выполнению."
+        },
+        {
+          "type": "image_url",
+          "image_url": f"https://api.telegram.org/file/bot7362682806:AAHC59p40XhRLhS0BvSAvZ12zHawLhyfRw4/{file_path}"
+        },
+      ]
+    }
+  ]
+)
+print(completion.choices[0].message.content)
 
 # import matplotlib.pyplot as plt
 # import io
