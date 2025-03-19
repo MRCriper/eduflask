@@ -5,10 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 # from DeeperSeek import DeepSeek
 # import asyncio
 from openai import OpenAI
-from RestrictedPython import compile_restricted
-from RestrictedPython import safe_builtins
-import RestrictedPython.Guards
-from importlib import import_module
 
 
 def get_response(request):
@@ -37,7 +33,7 @@ def get_response(request):
         "content": [
             {
             "type": "text",
-            "text": f"Привет, сгенерируй задачу по данным критериям: {request}. Твой ответ должен быть python-кодом, в котором будет главная функция, в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>)'. Рисунок для задачи генерируй с помощью библиотеки matplotlib. HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve). Все переменные должны принимать только такие названия. Также в коде не должно быть print. Все математические формулы адаптируй под синтаксис MathJax."
+            "text": f"Привет, сгенерируй задачу на русском языке по данным критериям: {request}. Твой ответ должен быть python-кодом, в котором будет главная функция generate_physics_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'. Рисунок для задачи генерируй с помощью библиотеки matplotlib(Проверяй, чтоб всё работало, как надо). HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve). Все переменные должны принимать только такие названия. Также в коде не должно быть print. Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно)." + f'Не задавай задачи с условием: Три конденсатора соединены так, как показано на рисунке. Конденсатор емкостью мкФ первоначально заряжен до напряжения В. Конденсаторы емкостями мкФ и мкФ изначально не заряжены. После замыкания ключа K установилось равновесие. Определите установившееся напряжения на всех конденсаторах.'
             },
         ]
         }
@@ -68,7 +64,7 @@ def get_response(request):
     messages=[
         {
         "role": "user",
-        "content": completion_0.choices[0].message.content + f"В данном тексте найди python-код и оставь только его. Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие. Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve. Если что-то из этого не так, исправь(то есть, убери print, добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче)."
+        "content": completion_0.choices[0].message.content + f"В данном тексте найди python-код и оставь только его. Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие. Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve. Во-вторых в коде должна быть функция generate_physics_problem(), в которой будет происходить генерация html-кода. Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_physics_problem()(Название ТОЛЬКО такое, никак не меняй его), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче)."
         }
     ]
     )
@@ -108,27 +104,30 @@ def student():
     if rq.method == 'POST':
         max_attempts = 5  # Максимальное количество попыток
         success = False
+        # f_r = open('code.py', mode='rt')
         # Получаем данные из формы
         request = rq.form['request']
         
         # Передаем результат в шаблон
-        my_globals = {}
 
-        for _ in range(max_attempts):
-            my_globals = {}
-            response = get_response(request) 
+        for _ in range(max_attempts): 
             try:
+                response = get_response(request)
                 # Получаем ответ от модели
                 
                 # Подготавливаем глобальные переменные
-                response = response[response.index('n')::]
+                response = response[response.index('n')+1::]
                 response = response[:response.index('`'):]
                 
                 # Выполняем сгенерированный код
-                exec(response)
-                
+                with open('code_ai.py', mode='wt', encoding='utf-8') as f:
+                    f.write(response)
+                import code_ai
+                html_output, hints, solve = code_ai.generate_physics_problem()
+                with open('code_ai.py', 'r+') as f:
+                    f.truncate(0)
                 # Проверяем наличие обязательных полей
-                if (my_globals.get('html_output')) and (my_globals.get('solve')) and (isinstance(my_globals.get('hints', None), list)):
+                if html_output and solve and hints:
                     success = True
                     break
                     
@@ -148,12 +147,13 @@ def student():
 
         # print(my_globals)
         if not success:
-            my_globals['html_output'] = '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>'
-            return Markup(my_globals['html_output'])
+            html_output = '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>'
+        return Markup(html_output)
         # print(f'{my_globals['html_output']}\n{my_globals['hints']}\n {my_globals['solve']}')
 
     return render_template("student.html")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    from werkzeug.serving import run_simple
+    run_simple('127.0.0.1', 5000, app)

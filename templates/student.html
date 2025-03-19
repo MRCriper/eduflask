@@ -56,10 +56,12 @@
             {% endif %} -->
             <div class="response">
                 {% if response %}
+                    <div class="hint">
+                        <button type="button" class="hint">
+                            <img class="hint-img" src="{{ url_for('static', filename='img/hint.png') }}" alt="hint">
+                        </button>
+                    </div>
                     {{ response | safe }}
-                    <button type="button" class="hint">
-                        <img class="hint-img" src="{{ url_for('static', filename='img/hint.png') }}" alt="hint">
-                    </button>
                 {% else %}
                     <div class="placeholder-text">Здесь появится ответ...</div>
                 {% endif %}
