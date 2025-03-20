@@ -23,10 +23,35 @@
             },
             body: `request=${encodeURIComponent(input.value)}`
         })
-        .then(response => response.text())
-        .then(html => {
-            responseDiv.innerHTML = html;
-            MathJax.typeset(); // Обновляем рендеринг формул
+        .then(response => response.json())
+        .then(data => {
+            const responseDiv = document.querySelector('.response');
+            // Очищаем контейнер
+            responseDiv.innerHTML = '';
+            
+            // Добавляем кнопку подсказки
+            const hintButton = `
+                <div class="hint">
+                    <button type="button" class="hint-btn">
+                        <img class="hint-img" src="{{ url_for('static', filename='img/hint.png') }}" alt="hint">
+                    </button>
+                </div>
+            `;
+            responseDiv.insertAdjacentHTML('afterbegin', hintButton);
+
+            // Добавляем основной контент
+            const content = document.createElement('div');
+            content.innerHTML = data.html;
+            responseDiv.appendChild(content);
+
+            // Инициализируем MathJax
+            MathJax.typeset();
+            
+            // Добавьте логику для отображения подсказок из data.hints
+            document.querySelector('.hint-btn').addEventListener('click', () => {
+            const hints = document.getElementById('hints-container');
+            hints.style.display = hints.style.display === 'none' ? 'block' : 'none';
+        });
         })
         .catch(error => {
             responseDiv.innerHTML = 'Ошибка: ' + error.message;
@@ -55,16 +80,8 @@
             <div class="response"></div>
             {% endif %} -->
             <div class="response">
-                {% if response %}
-                    <div class="hint">
-                        <button type="button" class="hint">
-                            <img class="hint-img" src="{{ url_for('static', filename='img/hint.png') }}" alt="hint">
-                        </button>
-                    </div>
-                    {{ response | safe }}
-                {% else %}
-                    <div class="placeholder-text">Здесь появится ответ...</div>
-                {% endif %}
+                <!-- Изначально пустой контейнер -->
+                <div class="placeholder-text">Здесь появится ответ...</div>
             </div>
             <!-- <form action="#" method="post">
                 <input type="text" name='request' placeholder="Введите запрос..." class="request" required>
