@@ -121,6 +121,8 @@ form {
     background: none;
     border: none;
     cursor: pointer;
+    opacity: 0; /* Скрываем кнопку по умолчанию */
+    transition: opacity 0.3s ease; /* Плавное появление */
 }
 
 .send-img {
@@ -147,9 +149,20 @@ form {
     cursor: pointer;
     right: 0;
     position: absolute;
+    opacity: 0; /* Скрываем кнопку по умолчанию */
+    transition: opacity 0.3s ease; /* Плавное появление */
 }
 
 .hint {
     position: relative;
     z-index: 2;
+}
+
+.response:hover .hint-btn {
+    opacity: 1;
+}
+
+/* Показываем кнопку отправки при наведении на форму */
+#requestForm:hover .send {
+    opacity: 1;
 }

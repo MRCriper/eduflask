@@ -37,6 +37,29 @@
                     </button>
                 </div>
             `;
+            let currentHintIndex = 0;
+            document.querySelector('.hint-btn').addEventListener('click', () => {
+                const hintsContainer = document.getElementById('hints-container');
+                const hints = hintsContainer ? hintsContainer.textContent.split('\n') : [];
+
+                if (hints.length > 0 && currentHintIndex < hints.length) {
+                    // Находим или создаем блок для отображения подсказки
+                    let hintDisplay = document.getElementById('hint-display');
+                    if (!hintDisplay) {
+                        hintDisplay = document.createElement('div');
+                        hintDisplay.id = 'hint-display';
+                        hintDisplay.style.marginTop = '10px';
+                        hintDisplay.style.color = '#666';
+                        hintsContainer.parentNode.insertBefore(hintDisplay, hintsContainer.nextSibling);
+                    }
+
+                    // Обновляем текст подсказки
+                    hintDisplay.textContent = `Подсказка ${currentHintIndex + 1}: ${hints[currentHintIndex]}`;
+                    currentHintIndex++;
+                } else {
+                    alert('Подсказок больше нет!');
+                }
+            });
             responseDiv.insertAdjacentHTML('afterbegin', hintButton);
 
             // Добавляем основной контент
@@ -48,10 +71,6 @@
             MathJax.typeset();
             
             // Добавьте логику для отображения подсказок из data.hints
-            document.querySelector('.hint-btn').addEventListener('click', () => {
-            const hints = document.getElementById('hints-container');
-            hints.style.display = hints.style.display === 'none' ? 'block' : 'none';
-        });
         })
         .catch(error => {
             responseDiv.innerHTML = 'Ошибка: ' + error.message;
