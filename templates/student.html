@@ -2,85 +2,9 @@
 
 {% block title %}Главная{% endblock %}
 {% block link %}
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link rel="stylesheet" href="{{ url_for("static", filename="css/student.css") }}">
-<script>
-    function submitForm() {
-        const input = document.getElementById('userInput');
-        const loading = document.getElementById('loading');
-        const responseDiv = document.querySelector('.response');
-        
-        if (!input.value.trim()) return;
-    
-        loading.style.display = 'flex';
-        responseDiv.innerHTML = '';
-    
-        fetch('/student', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `request=${encodeURIComponent(input.value)}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            const responseDiv = document.querySelector('.response');
-            // Очищаем контейнер
-            responseDiv.innerHTML = '';
-            
-            // Добавляем кнопку подсказки
-            const hintButton = `
-                <div class="hint">
-                    <button type="button" class="hint-btn">
-                        <img class="hint-img" src="{{ url_for('static', filename='img/hint.png') }}" alt="hint">
-                    </button>
-                </div>
-            `;
-            let currentHintIndex = 0;
-            document.querySelector('.hint-btn').addEventListener('click', () => {
-                const hintsContainer = document.getElementById('hints-container');
-                const hints = hintsContainer ? hintsContainer.textContent.split('\n') : [];
-
-                if (hints.length > 0 && currentHintIndex < hints.length) {
-                    // Находим или создаем блок для отображения подсказки
-                    let hintDisplay = document.getElementById('hint-display');
-                    if (!hintDisplay) {
-                        hintDisplay = document.createElement('div');
-                        hintDisplay.id = 'hint-display';
-                        hintDisplay.style.marginTop = '10px';
-                        hintDisplay.style.color = '#666';
-                        hintsContainer.parentNode.insertBefore(hintDisplay, hintsContainer.nextSibling);
-                    }
-
-                    // Обновляем текст подсказки
-                    hintDisplay.textContent = `Подсказка ${currentHintIndex + 1}: ${hints[currentHintIndex]}`;
-                    currentHintIndex++;
-                } else {
-                    alert('Подсказок больше нет!');
-                }
-            });
-            responseDiv.insertAdjacentHTML('afterbegin', hintButton);
-
-            // Добавляем основной контент
-            const content = document.createElement('div');
-            content.innerHTML = data.html;
-            responseDiv.appendChild(content);
-
-            // Инициализируем MathJax
-            MathJax.typeset();
-            
-            // Добавьте логику для отображения подсказок из data.hints
-        })
-        .catch(error => {
-            responseDiv.innerHTML = 'Ошибка: ' + error.message;
-        })
-        .finally(() => {
-            loading.style.display = 'none';
-            input.value = '';
-        });
-    }
-</script>
+<script src="{{ url_for("static", filename="js/student.js") }}"></script>
 {% endblock %}
 {% block body %}
     <div class="header">
@@ -107,7 +31,7 @@
                 <button type="submit" class="send"><img class="send-img" src="{{ url_for("static", filename="img/send.png") }}" alt="snd"></button>                   
             </form> -->
             <form id="requestForm" onsubmit="return false;">
-                <input type="text" id="userInput" name='request' placeholder="Введите запрос..." class="request" required>
+                <textarea id="userInput" name='request' placeholder="Введите запрос..." class="request" required></textarea>
                 <button type="button" onclick="submitForm()" class="send">
                     <img class="send-img" src="{{ url_for('static', filename='img/send.png') }}" alt="snd">
                 </button>                   

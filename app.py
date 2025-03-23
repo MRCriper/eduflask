@@ -64,7 +64,7 @@ def get_response(request):
     messages=[
         {
         "role": "user",
-        "content": completion_0.choices[0].message.content + f"В данном тексте найди python-код и оставь только его. Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие. Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve. Во-вторых в коде должна быть функция generate_physics_problem(), в которой будет происходить генерация html-кода. Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_physics_problem()(Название ТОЛЬКО такое, никак не меняй его), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче)." + 'html_output должен быть в таком формате: html_output = <h3>Задача</h3>{html-код}<div id="hints-container" style="display:none;">{"\n".join(hints)}</div><div id="solve" style="display:none;">{solve}</div>'
+        "content": completion_0.choices[0].message.content + f"В данном тексте найди python-код и оставь только его. Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие. Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve. Во-вторых в коде должна быть функция generate_physics_problem(), в которой будет происходить генерация html-кода. В-третьих проверь синтаксис MathJax в математических формулах. Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_physics_problem()(Название ТОЛЬКО такое, никак не меняй его), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче, математические формулы исправь для синтаксиса MathJax)." + 'html_output должен быть в таком формате: html_output = <h3>Задача</h3>{html-код}<div id="hints-container" style="display:none;">{"(тут вставь символ переноса строки)".join(hints)}</div><div id="solve" style="display:none;">{solve}</div>'
         }
     ]
     )
@@ -107,6 +107,8 @@ def student():
         # f_r = open('code.py', mode='rt')
         # Получаем данные из формы
         request = rq.form['request']
+
+        print(request)
         
         # Передаем результат в шаблон
 
@@ -146,9 +148,9 @@ def student():
         #     my_globals["html_output"] = '<h3>Произошла ошибка. Попробуйте ещё раз</h3>'
 
         # print(my_globals)
-        print(hints, solve)
         if not success:
             html_output, hints, solve = '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>', [], "-"
+        print(hints, solve)
         return jsonify({
         "html": html_output,
         "hints": hints,
