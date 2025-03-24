@@ -53,6 +53,7 @@ main {
     height: 75vh;
     justify-content: end;
     align-items: center;
+    padding: 0 10px;
 }
 
 .acc-img:hover {
@@ -69,28 +70,34 @@ main {
     justify-content: space-between;
 } */
 
-form {
-    position: relative; /* Добавляем контекст позиционирования */
-    width: 16vw; /* Совпадает с шириной поля ввода */
+#requestForm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
 }
 
 
 .request {
     /* width: 16vw; */
     width: 100%;
-    height: auto;
     min-height: 32px;
     max-height: 150px;
     border-radius: 20px;
     background-color: aquamarine;
     border: none;
-    margin: 5px;
-    flex: 0 0 auto;
+    line-height: 1.5;
     resize: none;
     overflow-y: auto;
-    padding: 8px;
+    padding: 8px 35px 8px 35px;
     box-sizing: border-box;
     font-size: 16px;
+    scrollbar-width: none;
+    transition: height 0.2s ease-out;
+}
+
+.request::-webkit-scrollbar {
+    display: none; /* Скрываем полосу прокрутки в Chrome, Safari, Edge */
 }
 
 .request:focus {
@@ -118,23 +125,25 @@ form {
     font-size: 24px;
 }
 
-.send {
+.attach-btn, .send {
+    position: absolute;
     width: 24px;
     height: 24px;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 30%;
     background: none;
     border: none;
     cursor: pointer;
-    opacity: 0; /* Скрываем кнопку по умолчанию */
-    transition: opacity 0.3s ease; /* Плавное появление */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
 }
 
-.send-img {
-    width: 24px;
-    height: 24px;
+.send {
+    right: 14px;
+}
+
+.attach-btn {
+    left: 4px;
 }
 
 .placeholder-text {
@@ -170,6 +179,11 @@ form {
 }
 
 /* Показываем кнопку отправки при наведении на форму */
-#requestForm:hover .send {
+#requestForm:hover .send, #requestForm:hover .attach-btn {
     opacity: 1;
+}
+
+.attach-img, .send-img {
+    width: 24px;
+    height: 24px;
 }

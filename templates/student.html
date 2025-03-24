@@ -31,6 +31,9 @@
                 <button type="submit" class="send"><img class="send-img" src="{{ url_for("static", filename="img/send.png") }}" alt="snd"></button>                   
             </form> -->
             <form id="requestForm" onsubmit="return false;">
+                <button type="button" class="attach-btn">
+                    <img class="attach-img" src="{{ url_for('static', filename='img/clip.png') }}" alt="attach">
+                </button>
                 <textarea id="userInput" name='request' placeholder="Введите запрос..." class="request" required></textarea>
                 <button type="button" onclick="submitForm()" class="send">
                     <img class="send-img" src="{{ url_for('static', filename='img/send.png') }}" alt="snd">

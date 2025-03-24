@@ -1,11 +1,28 @@
 function autoResizeTextarea(textarea) {
+    // Сбрасываем высоту и устанавливаем заново
     textarea.style.height = 'auto';
-    textarea.style.height = (textarea.scrollHeight) + 'px';
+    const newHeight = Math.min(textarea.scrollHeight, 150); // Ограничиваем максимальной высотой
+    textarea.style.height = `${newHeight}px`;
+    
+    // Показываем/скрываем полосу прокрутки
+    textarea.style.overflowY = textarea.scrollHeight > 150 ? 'auto' : 'hidden';
 }
 
-const textarea = document.querySelector('.request');
-textarea.addEventListener('input', () => {
+document.addEventListener('DOMContentLoaded', () => {
+    const textarea = document.querySelector('.request');
+    
+    // Обработчик для динамического изменения
+    textarea.addEventListener('input', () => {
+        autoResizeTextarea(textarea);
+    });
+    
+    // Обработчик для изменения при загрузке
     autoResizeTextarea(textarea);
+    
+    // Обработчик для изменения при изменении размеров окна
+    window.addEventListener('resize', () => {
+        autoResizeTextarea(textarea);
+    });
 });
 
 function submitForm() {
@@ -35,7 +52,7 @@ function submitForm() {
         const hintButton = `
             <div class="hint">
                 <button type="button" class="hint-btn">
-                    <img class="hint-img" src="{{ url_for('static', filename='img/hint.png') }}" alt="hint">
+                    <img class="hint-img" src="static/img/hint.png" alt="hint">
                 </button>
             </div>
         `;

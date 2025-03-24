@@ -107,8 +107,6 @@ def student():
         # f_r = open('code.py', mode='rt')
         # Получаем данные из формы
         request = rq.form['request']
-
-        print(request)
         
         # Передаем результат в шаблон
 
