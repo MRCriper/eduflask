@@ -5,9 +5,18 @@ from flask_sqlalchemy import SQLAlchemy
 # from DeeperSeek import DeepSeek
 # import asyncio
 from openai import OpenAI
+import requests
+from werkzeug.utils import secure_filename
+import os
+import tempfile
 
 
-def get_response(request):
+def get_response(text, files=None):
+
+    client_image = OpenAI(
+    api_key="io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6IjA0MDg5YzgwLTY1ZDUtNGViNS1hNmE3LWQ1NDYzNzFiOWNmMyIsImV4cCI6NDg5NTkxODA3N30.cpjpRsQSoTzCdIXZELNzATjc2eO9ns93EfWFfX4Jxj4IFM7DBHbGIhqmL7lvs6FtQLJR0SmLxD4zU_ndBVFpUw",
+    base_url="https://api.intelligence.io.solutions/api/v1/",
+    )
 
     client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
@@ -33,7 +42,7 @@ def get_response(request):
         "content": [
             {
             "type": "text",
-            "text": f"Привет, сгенерируй задачу на русском языке по данным критериям: {request}. Твой ответ должен быть python-кодом, в котором будет главная функция generate_physics_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'. Рисунок для задачи генерируй с помощью библиотеки matplotlib(Проверяй, чтоб всё работало, как надо). HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve). Все переменные должны принимать только такие названия. Также в коде не должно быть print. Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно)."
+            "text": f"Привет, сгенерируй задачу на русском языке по данным критериям: {text}. Твой ответ должен быть python-кодом, в котором будет главная функция generate_physics_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'. Рисунок для задачи генерируй с помощью библиотеки matplotlib(Проверяй, чтоб всё работало, как надо). HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve). Все переменные должны принимать только такие названия. Также в коде не должно быть print. Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно)."
             },
         ]
         }
@@ -68,6 +77,15 @@ def get_response(request):
         }
     ]
     )
+    
+    if files:
+        completion_image = client_image.chat.completions.create(
+        model="meta-llama/Llama-3.2-90B-Vision-Instruct",
+        messages=[
+            {"role": "system", "content": "Ты помощник для очень мощной и умной LLM, ты - её глаза. Твоя задача - тщательно просматривать отправленные тебе фотографии и описывать их в деталях, но без лишней воды.."},
+            {"role": "user", "content": [{'type': 'image_url', 'image_url': {'url': files[0]}}]}
+        ]
+        )
 
     # response = await api.send_message(
     #     completion.choices[0].message.content + "В данном тексте найди код на python и оставь только его, в строчке graphic = base64.b64encode(image_png).decode('utf-8') убери 'utf-8'. А также убери все print()",
@@ -81,11 +99,30 @@ def get_response(request):
 
     # await api.logout()
 
-    return completion_last.choices[0].message.content
+    return completion_image.choices[0].message.content
+
+
+def upload_to_uguu(file_path):
+    """Загружает файл на Uguu и возвращает URL"""
+    try:
+        with open(file_path, 'rb') as f:
+            response = requests.post(
+                app.config["UGUU_URL"],
+                files={'file': f},
+                data={'name': os.path.basename(file_path)}
+            )
+        if response.ok:
+            return response.text.strip()  # Uguu возвращает прямую ссылку
+        return None
+    except Exception as e:
+        print(f"Ошибка загрузки на Uguu: {str(e)}")
+        return None
 
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///eduflask.db"
+app.config["UPLOAD_FOLDER"] = tempfile.gettempdir()
+app.config["UGUU_URL"] = "https://uguu.se/upload"
 db = SQLAlchemy(app)
 
 
@@ -104,32 +141,53 @@ def student():
     if rq.method == 'POST':
         max_attempts = 5  # Максимальное количество попыток
         success = False
-        # f_r = open('code.py', mode='rt')
-        # Получаем данные из формы
-        request = rq.form['request']
+        file_links = []
+        # Получаем текст запроса
+        request_text = rq.form.get('request', '')
         
+        # Обрабатываем файлы
+        request_files = rq.files.getlist('files')
+
+        if request_files:
+            for file in request_files:
+                if file.filename == '':
+                    continue
+                
+                # Сохраняем временно файл
+                filename = secure_filename(file.filename)
+                temp_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(temp_path)
+                
+                # Загружаем на Uguu
+                file_url = upload_to_uguu(temp_path)
+                if file_url:
+                    file_links.append(file_url)
+                
+                # Удаляем временный файл
+                os.unlink(temp_path)
+
         # Передаем результат в шаблон
 
         for _ in range(max_attempts): 
             try:
-                response = get_response(request)
+                response = get_response(request_text, file_links)
                 # Получаем ответ от модели
                 
                 # Подготавливаем глобальные переменные
-                response = response[response.index('n')+1::]
-                response = response[:response.index('`'):]
+                # response = response[response.index('n')+1::]
+                # response = response[:response.index('`'):]
                 
-                # Выполняем сгенерированный код
-                with open('code_ai.py', mode='wt', encoding='utf-8') as f:
-                    f.write(response)
-                import code_ai
-                html_output, hints, solve = code_ai.generate_physics_problem()
-                with open('code_ai.py', 'r+') as f:
-                    f.truncate(0)
-                # Проверяем наличие обязательных полей
-                if html_output and solve and hints:
-                    success = True
-                    break
+                # # Выполняем сгенерированный код
+                # with open('code_ai.py', mode='wt', encoding='utf-8') as f:
+                #     f.write(response)
+                # import code_ai
+                # html_output, hints, solve = code_ai.generate_physics_problem()
+                # with open('code_ai.py', 'r+') as f:
+                #     f.truncate(0)
+                # # Проверяем наличие обязательных полей
+                # if html_output and solve and hints:
+                #     success = True
+                #     break
                     
             except Exception as e:
                 print(f"Attempt failed: {str(e)}")
@@ -149,6 +207,7 @@ def student():
         if not success:
             html_output, hints, solve = '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>', [], "-"
         print(hints, solve)
+        print(response)
         return jsonify({
         "html": html_output,
         "hints": hints,

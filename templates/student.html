@@ -31,13 +31,15 @@
                 <button type="submit" class="send"><img class="send-img" src="{{ url_for("static", filename="img/send.png") }}" alt="snd"></button>                   
             </form> -->
             <form id="requestForm" onsubmit="return false;">
-                <button type="button" class="attach-btn">
+                <label for="fileInput" class="attach-btn">
                     <img class="attach-img" src="{{ url_for('static', filename='img/clip.png') }}" alt="attach">
-                </button>
+                </label>
+                <input type="file" id="fileInput" style="display: none;" multiple>
                 <textarea id="userInput" name='request' placeholder="Введите запрос..." class="request" required></textarea>
                 <button type="button" onclick="submitForm()" class="send">
                     <img class="send-img" src="{{ url_for('static', filename='img/send.png') }}" alt="snd">
-                </button>                   
+                </button>
+                <div id="filePreview" class="file-preview"></div>                   
             </form>
         </div>
     </main>
