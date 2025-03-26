@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, session
 from markupsafe import Markup
 from flask import request as rq
 from flask_sqlalchemy import SQLAlchemy
@@ -6,66 +6,31 @@ from flask_sqlalchemy import SQLAlchemy
 # import asyncio
 from openai import OpenAI
 import requests
-from werkzeug.utils import secure_filename
-import os
-import tempfile
+import base64
 
 
 def get_response(text, files=None):
 
-    client_image = OpenAI(
-    api_key="io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6IjA0MDg5YzgwLTY1ZDUtNGViNS1hNmE3LWQ1NDYzNzFiOWNmMyIsImV4cCI6NDg5NTkxODA3N30.cpjpRsQSoTzCdIXZELNzATjc2eO9ns93EfWFfX4Jxj4IFM7DBHbGIhqmL7lvs6FtQLJR0SmLxD4zU_ndBVFpUw",
-    base_url="https://api.intelligence.io.solutions/api/v1/",
-    )
-
     client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key="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",
+    api_key="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",
     )
-
-    # api = DeepSeek(
-    #     token = "nTdtrWDQWwH0VgOnsGwxXiDHxgRk56u1eva+O+0JglOa4pLsCf4WxDeMCeO0FhoX",
-    #     chrome_args = [],
-    #     verbose = False,
-    #     headless = True,
-    #     attempt_cf_bypass = True,
-    # )
-
-    # await api.initialize()
 
     completion_0 = client.chat.completions.create(
     extra_body={},
-    model="google/gemini-2.0-flash-exp:free",
+    model="google/gemini-2.5-pro-exp-03-25:free",
     messages=[
     {
         "role": "user",
         "content": [
             {
             "type": "text",
-            "text": f"Привет, сгенерируй задачу на русском языке по данным критериям: {text}. Твой ответ должен быть python-кодом, в котором будет главная функция generate_physics_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'. Рисунок для задачи генерируй с помощью библиотеки matplotlib(Проверяй, чтоб всё работало, как надо). HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve). Все переменные должны принимать только такие названия. Также в коде не должно быть print. Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно)."
+            "text": f"Привет, сгенерируй задачу на русском языке по данным критериям: {text}. Твой ответ должен быть python-кодом, в котором будет главная функция generate_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'. Рисунок для задачи генерируй с помощью библиотеки matplotlib(Проверяй, чтоб всё работало, как надо). HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve). Все переменные должны принимать только такие названия. Также в коде не должно быть print. Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно)."
             },
         ]
         }
     ]
     )
-
-    # completion = client.chat.completions.create(
-    # extra_body={},
-    # model="google/gemini-2.0-flash-lite-preview-02-05:free",
-    # messages=[
-    #     {
-    #     "role": "user",
-    #     "content": completion_0.choices[0].message.content + f"""ВСЕ import удали и замени на import_module(), в коде не  должно остаться ни одного import. Тебе не нужно создавать новых функций, не нужно трогать остальной код, не нужно создавать import_module, лишь измени старые import.
-    #                                                         Пример:
-    #                                                         Запрос: "import matplotlib.pyplot as plt
-    #                                                         import io
-    #                                                         import base64"
-    #                                                         Твой ответ: 'plt = import_module(matplotlib).pyplot
-    #                                                         io = import_module(io)
-    #                                                         base64 = import_module(base64)'."""
-    #     }
-    # ]
-    # )
 
     completion_last = client.chat.completions.create(
     extra_body={},
@@ -73,56 +38,93 @@ def get_response(text, files=None):
     messages=[
         {
         "role": "user",
-        "content": completion_0.choices[0].message.content + f"В данном тексте найди python-код и оставь только его. Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие. Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve. Во-вторых в коде должна быть функция generate_physics_problem(), в которой будет происходить генерация html-кода. В-третьих проверь синтаксис MathJax в математических формулах. Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_physics_problem()(Название ТОЛЬКО такое, никак не меняй его), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче, математические формулы исправь для синтаксиса MathJax)." + 'html_output должен быть в таком формате: html_output = <h3>Задача</h3>{html-код}<div id="hints-container" style="display:none;">{"(тут вставь символ переноса строки)".join(hints)}</div><div id="solve" style="display:none;">{solve}</div>'
+        "content": completion_0.choices[0].message.content + f"В данном тексте найди python-код и оставь только его. Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие. Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve. Во-вторых в коде должна быть функция generate_problem(), в которой будет происходить генерация html-кода. В-третьих проверь синтаксис MathJax в математических формулах. Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_physics_problem()(Название ТОЛЬКО такое, никак не меняй его), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче, математические формулы исправь для синтаксиса MathJax)." + 'html_output должен быть в таком формате: html_output = <h3>Задача</h3>{html-код}<div id="hints-container" style="display:none;">{"(тут вставь символ переноса строки)".join(hints)}</div><div id="solve" style="display:none;">{solve}</div>'
         }
     ]
     )
     
     if files:
-        completion_image = client_image.chat.completions.create(
-        model="meta-llama/Llama-3.2-90B-Vision-Instruct",
+        # Создаем список описаний файлов для LLM
+        file_descriptions = []
+        for file in files:
+            if file['type'] == 'image':
+                # Для изображений создаем data URL
+                file_descriptions.append({
+                    'type': 'image_url',
+                    'image_url': {
+                        'url': f"data:{file['mimeType']};base64,{file['data']}"
+                    }
+                })
+            elif file['type'] == 'text':
+                # Для текстовых файлов добавляем содержимое
+                file_descriptions.append({
+                    'type': 'text',
+                    'text': f"Содержимое файла:\n{file['data']}"
+                })
+    
+        completion_image = client.chat.completions.create(
+        model="google/gemini-2.5-pro-exp-03-25:free",
         messages=[
-            {"role": "system", "content": "Ты помощник для очень мощной и умной LLM, ты - её глаза. Твоя задача - тщательно просматривать отправленные тебе фотографии и описывать их в деталях, но без лишней воды.."},
-            {"role": "user", "content": [{'type': 'image_url', 'image_url': {'url': files[0]}}]}
+            {"role": "user", "content": [
+                        {"type": "text", "text": 'Представь, что ты учитель и тебе нужно максимально понятно объяснить что-то своим ученикам. Описывай подробно, как ты приходишь к тому или иному действию.' + f"Запрос пользователя: {text}"},
+                        *file_descriptions
+                    ]}
         ]
         )
+        
+        return completion_image.choices[0].message.content
 
-    # response = await api.send_message(
-    #     completion.choices[0].message.content + "В данном тексте найди код на python и оставь только его, в строчке graphic = base64.b64encode(image_png).decode('utf-8') убери 'utf-8'. А также убери все print()",
-    #     deepthink = False,  # Whether to use the DeepThink option or not
-    #     search = False,  # Whether to use the Search option or not
-    #     slow_mode = False,  # Whether to send the message in slow mode or not
-    #     slow_mode_delay = 0.25,  # The delay between each character when sending the message in slow mode
-    #     timeout = 60,  # The time to wait for the response before timing out
-    # )  # Returns a Response object
-    # return response.text
-
-    # await api.logout()
-
-    return completion_image.choices[0].message.content
+    return completion_last.choices[0].message.content
 
 
-def upload_to_uguu(file_path):
-    """Загружает файл на Uguu и возвращает URL"""
+def verify_solution(user_solution, correct_solution, hints):
+    """Проверяет решение пользователя через ИИ"""
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key="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"
+    )
+    
+    response = client.chat.completions.create(
+        model="google/gemini-2.5-pro-exp-03-25:free",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+                Ты - преподаватель. Проверь решение ученика и дай развернутый комментарий.
+                Правильное решение: {correct_solution}
+                Ответ ученика: {user_solution}
+                Подсказки к задаче: {hints}
+                
+                Проанализируй ответ ученика:
+                1. Если решение верное - подтверди и похвали
+                2. Если есть ошибки - укажи на них и объясни
+                3. Используй подсказки, если они могут помочь
+                """
+            }
+        ]
+    )
+    return response.choices[0].message.content
+
+
+def get_code(response):
     try:
-        with open(file_path, 'rb') as f:
-            response = requests.post(
-                app.config["UGUU_URL"],
-                files={'file': f},
-                data={'name': os.path.basename(file_path)}
-            )
-        if response.ok:
-            return response.text.strip()  # Uguu возвращает прямую ссылку
-        return None
-    except Exception as e:
-        print(f"Ошибка загрузки на Uguu: {str(e)}")
-        return None
+        response = response[response.index('n')+1:]
+        response = response[:response.index("`")]
+
+        with open('code_ai.py', mode='wt', encoding='utf-8') as f:
+            f.write(response)
+        import code_ai
+        html_output, hints, solve = code_ai.generate_problem()
+        with open('code_ai.py', 'r+') as f:
+            f.truncate(0)
+        return html_output, hints, solve
+    except:
+        return '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>', [], ''
 
 
 app = Flask(__name__)
+app.secret_key = 'Axxvvjw'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///eduflask.db"
-app.config["UPLOAD_FOLDER"] = tempfile.gettempdir()
-app.config["UGUU_URL"] = "https://uguu.se/upload"
 db = SQLAlchemy(app)
 
 
@@ -137,84 +139,96 @@ def index():
 
 @app.route("/student", methods=['GET', 'POST'])
 def student():
-    response = None
     if rq.method == 'POST':
         max_attempts = 5  # Максимальное количество попыток
         success = False
-        file_links = []
-        # Получаем текст запроса
-        request_text = rq.form.get('request', '')
-        
-        # Обрабатываем файлы
-        request_files = rq.files.getlist('files')
-
-        if request_files:
-            for file in request_files:
-                if file.filename == '':
-                    continue
-                
-                # Сохраняем временно файл
-                filename = secure_filename(file.filename)
-                temp_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-                file.save(temp_path)
-                
-                # Загружаем на Uguu
-                file_url = upload_to_uguu(temp_path)
-                if file_url:
-                    file_links.append(file_url)
-                
-                # Удаляем временный файл
-                os.unlink(temp_path)
-
-        # Передаем результат в шаблон
-
-        for _ in range(max_attempts): 
+        for _ in range(max_attempts):
             try:
-                response = get_response(request_text, file_links)
-                # Получаем ответ от модели
+                data = rq.get_json()
+                request_text = data.get('request', '')
+                files_data = data.get('files', [])
+
+                # Обрабатываем все файлы
+                processed_files = []
+                for file_info in files_data:
+                    if file_info['type'] == 'image':
+                        processed_files.append({
+                            'type': 'image',
+                            'data': file_info['data'],  # base64 строка
+                            'mimeType': file_info['mimeType']
+                        })
+                    elif file_info['type'] == 'text':
+                        processed_files.append({
+                            'type': 'text',
+                            'data': file_info['data']
+                        })
+                    else:
+                        processed_files.append({
+                            'type': 'binary',
+                            'data': file_info['data'],
+                            'mimeType': file_info['mimeType']
+                        })
+
+                if 'task' not in session:  # Первый запрос - генерация задачи
+                    response = get_response(request_text, processed_files)
+
+                    html_output, hints, solve = get_code(response)
+
+                    # Проверяем наличие обязательных полей
+                    if html_output and solve and hints:
+                        print(hints)
+                        print(html_output)
+                        session['task'] = {
+                        'html_output': html_output,
+                        'hints': hints,  # Извлеченные подсказки
+                        'solve': solve   # Правильный ответ
+                        }
+                        
+                        success = True
+
+                        return jsonify({
+                                "type": "task",
+                                "html": html_output,
+                                "hints": hints,
+                                "solve": ""  # Ответ не показываем
+                                })
+                    else:
+                        continue
                 
-                # Подготавливаем глобальные переменные
-                # response = response[response.index('n')+1::]
-                # response = response[:response.index('`'):]
-                
-                # # Выполняем сгенерированный код
-                # with open('code_ai.py', mode='wt', encoding='utf-8') as f:
-                #     f.write(response)
-                # import code_ai
-                # html_output, hints, solve = code_ai.generate_physics_problem()
-                # with open('code_ai.py', 'r+') as f:
-                #     f.truncate(0)
-                # # Проверяем наличие обязательных полей
-                # if html_output and solve and hints:
-                #     success = True
-                #     break
+                # Сохраняем данные задачи в сессии
                     
+                
+                else:  # Последующие запросы - проверка решения
+                    user_solution = request_text.strip()
+                    correct_solution = session['task']['solve']
+                    
+                    # Проверяем решение через ИИ
+                    verification_result = verify_solution(
+                        user_solution, 
+                        correct_solution,
+                        session['task']['hints']
+                    )
+                    
+                    return jsonify({
+                        "type": "verification",
+                        "html": verification_result,
+                        "is_correct": False,  # Можно добавить логику проверки
+                        "hints": session['task']['hints']
+                    })
+
             except Exception as e:
-                print(f"Attempt failed: {str(e)}")
-                continue
-        # try:
-        #     while ((response[0] != 'i') or (response[-1] == '`')) and (not my_globals["hints"]):
-        #         try:
-        #             response = response[response.index('i')::]
-        #             response = response[:response.index('`'):]
-        #         except:
-        #             response = main(request)
-        #     exec(response, my_globals)
-        # except:   
-        #     my_globals["html_output"] = '<h3>Произошла ошибка. Попробуйте ещё раз</h3>'
-
-        # print(my_globals)
+                print(f"Ошибка: {str(e)}")
+                
         if not success:
-            html_output, hints, solve = '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>', [], "-"
-        print(hints, solve)
-        print(response)
-        return jsonify({
-        "html": html_output,
-        "hints": hints,
-        "solve": solve
-        })
-        # print(f'{my_globals['html_output']}\n{my_globals['hints']}\n {my_globals['solve']}')
+            with open('code_ai.py', 'r+') as f:
+                    f.truncate(0)
+            return jsonify({
+                "html": '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>',
+                "hints": [],
+                "solve": ""
+            })
 
+    session.clear()
     return render_template("student.html")
 
 

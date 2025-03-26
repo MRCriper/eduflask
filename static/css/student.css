@@ -246,3 +246,40 @@ main {
 .remove-file:hover {
     color: #cc0000;
 }
+
+.verification-result {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+}
+
+.correct {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.incorrect {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.solution-form {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 10px;
+}
+
+.task-container {
+    margin-bottom: 20px;
+}
+
+.error {
+    color: red;
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 5px;
+}
