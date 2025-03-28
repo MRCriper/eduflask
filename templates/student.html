@@ -2,50 +2,18 @@
 
 {% block title %}Главная{% endblock %}
 {% block link %}
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link rel="stylesheet" href="{{ url_for("static", filename="css/student.css") }}">
-<script>
-    function submitForm() {
-        const input = document.getElementById('userInput');
-        const loading = document.getElementById('loading');
-        const responseDiv = document.querySelector('.response');
-        
-        if (!input.value.trim()) return;
-    
-        loading.style.display = 'flex';
-        responseDiv.innerHTML = '';
-    
-        fetch('/student', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `request=${encodeURIComponent(input.value)}`
-        })
-        .then(response => response.text())
-        .then(html => {
-            responseDiv.innerHTML = html;
-            MathJax.typeset(); // Обновляем рендеринг формул
-        })
-        .catch(error => {
-            responseDiv.innerHTML = 'Ошибка: ' + error.message;
-        })
-        .finally(() => {
-            loading.style.display = 'none';
-            input.value = '';
-        });
-    }
-</script>
+<script src="{{ url_for("static", filename="js/student.js") }}"></script>
 {% endblock %}
 {% block body %}
     <div class="header">
-        <a class="calendar"><img class="cal-img" src="{{ url_for("static", filename="img/calendar.png") }}" alt="calendar"></a>
         <h1>
             Главная
-        </h1>
-        <a class="notification"><img class="not-img" src="{{ url_for("static", filename="img/notification.png") }}" alt="notification"></a>
-        <a class="account"><img class="acc-img" src="{{ url_for("static", filename="img/user.png") }}" alt="account"></a>
+        </h1>   
+        <div class="account">
+            <img class="acc-img" src="{{ url_for('static', filename='img/user.png') }}" alt="account">
+        </div>
     </div>
     <main>
         <div class="common">
@@ -55,24 +23,23 @@
             <div class="response"></div>
             {% endif %} -->
             <div class="response">
-                {% if response %}
-                    {{ response | safe }}
-                    <button type="button" class="hint">
-                        <img class="hint-img" src="{{ url_for('static', filename='img/hint.png') }}" alt="hint">
-                    </button>
-                {% else %}
-                    <div class="placeholder-text">Здесь появится ответ...</div>
-                {% endif %}
+                <!-- Изначально пустой контейнер -->
+                <div class="placeholder-text">Здесь появится ответ...</div>
             </div>
             <!-- <form action="#" method="post">
                 <input type="text" name='request' placeholder="Введите запрос..." class="request" required>
                 <button type="submit" class="send"><img class="send-img" src="{{ url_for("static", filename="img/send.png") }}" alt="snd"></button>                   
             </form> -->
             <form id="requestForm" onsubmit="return false;">
-                <input type="text" id="userInput" name='request' placeholder="Введите запрос..." class="request" required>
+                <label for="fileInput" class="attach-btn">
+                    <img class="attach-img" src="{{ url_for('static', filename='img/clip.png') }}" alt="attach">
+                </label>
+                <input type="file" id="fileInput" style="display: none;" multiple>
+                <textarea id="userInput" name='request' placeholder="Введите запрос..." class="request" required></textarea>
                 <button type="button" onclick="submitForm()" class="send">
                     <img class="send-img" src="{{ url_for('static', filename='img/send.png') }}" alt="snd">
-                </button>                   
+                </button>
+                <div id="filePreview" class="file-preview"></div>                   
             </form>
         </div>
     </main>
