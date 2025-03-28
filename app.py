@@ -14,11 +14,7 @@ def get_response(text, files=None):
 
     client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-<<<<<<< HEAD
     api_key="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",
-=======
-    api_key="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",
->>>>>>> 7812bf7a0b778ef27a4c6eb037b995c7cd0e3bc7
     )
     
     if files:
@@ -139,11 +135,7 @@ def verify_solution(user_solution, correct_solution, hints, files_data=None):
     """Проверяет решение пользователя через ИИ"""
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-<<<<<<< HEAD
         api_key="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"
-=======
-        api_key="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"
->>>>>>> 7812bf7a0b778ef27a4c6eb037b995c7cd0e3bc7
     )
 
     messages = [{
@@ -530,8 +522,4 @@ def student():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app(environs, start_response)
-=======
-    app(environs, start_response)
->>>>>>> 7812bf7a0b778ef27a4c6eb037b995c7cd0e3bc7

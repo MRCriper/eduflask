@@ -223,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsText(file);
         });
     }
-<<<<<<< HEAD
 
     function displayFiles(filesData) {
         const filesContainer = document.querySelector('.files-container');
@@ -258,8 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
             filesContainer.appendChild(fileElement);
         });
     }
-=======
->>>>>>> 7812bf7a0b778ef27a4c6eb037b995c7cd0e3bc7
     
     let currentTask = null;  // Для хранения состояния на клиенте
 
@@ -356,11 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             '<div class="incorrect">✗ Есть ошибки</div>'}
                     </div>
                 `;
-<<<<<<< HEAD
-                responseDiv.innerHTML = data.task_html;
-=======
-                responseDiv.innerHTML += data.html;
->>>>>>> 7812bf7a0b778ef27a4c6eb037b995c7cd0e3bc7
+                responseDiv.innerHTML += data.task_html;
                 
                 if (data.is_correct) {
                     // Очищаем сессию для новой задачи
