@@ -8,12 +8,12 @@
 {% endblock %}
 {% block body %}
     <div class="header">
-        <a class="calendar"><img class="cal-img" src="{{ url_for("static", filename="img/calendar.png") }}" alt="calendar"></a>
         <h1>
             Главная
-        </h1>
-        <a class="notification"><img class="not-img" src="{{ url_for("static", filename="img/notification.png") }}" alt="notification"></a>
-        <a class="account"><img class="acc-img" src="{{ url_for("static", filename="img/user.png") }}" alt="account"></a>
+        </h1>   
+        <div class="account">
+            <img class="acc-img" src="{{ url_for('static', filename='img/user.png') }}" alt="account">
+        </div>
     </div>
     <main>
         <div class="common">

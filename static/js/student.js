@@ -210,6 +210,10 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
         });
     }
+
+    document.querySelector('.account')?.addEventListener('click', function() {
+        window.location.href = '/account';
+    });
     
     function readFileAsText(file) {
         return new Promise((resolve, reject) => {
@@ -234,10 +238,40 @@ document.addEventListener('DOMContentLoaded', () => {
     
         loading.style.display = 'flex';
         responseDiv.innerHTML = '';
+
+        // Добавим эту функцию для инициализации кнопки подсказки
+        function initHintButton(hints) {
+            const hintBtn = document.querySelector('.hint-btn');
+            if (!hintBtn) return;
+
+            let currentHintIndex = 0;
+            
+            hintBtn.addEventListener('click', () => {
+                if (!hints || hints.length === 0) {
+                    showNotification('Подсказки отсутствуют', 'warning');
+                    return;
+                }
+
+                let hintDisplay = document.getElementById('hint-display');
+                if (!hintDisplay) {
+                    hintDisplay = document.createElement('div');
+                    hintDisplay.id = 'hint-display';
+                    hintDisplay.style.marginTop = '10px';
+                    hintDisplay.style.color = '#666';
+                    document.querySelector('.response').appendChild(hintDisplay);
+                }
+                
+                hintDisplay.innerHTML = `Подсказка ${currentHintIndex + 1}: ${hints[currentHintIndex]}`;
+                currentHintIndex = (currentHintIndex + 1) % hints.length;
+                
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.typesetPromise([hintDisplay]);
+                }
+            });
+        }
     
         try {
             const processedFiles = await processSelectedFiles(selectedFiles);
-            
             const response = await fetch('/student', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -246,8 +280,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     files: processedFiles
                 })
             });
-    
+            
             const data = await response.json();
+            
+            if (data.type === "verification" && data.task_files) {
+                // Показываем файлы при проверке
+                displayFiles(data.task_files);
+            }
 
             console.log("Полученные данные:", data);
             
@@ -255,31 +294,23 @@ document.addEventListener('DOMContentLoaded', () => {
             responseDiv.innerHTML = '';
             
             if (data.type === "task") {
-                // Первый запрос - показываем задачу
                 currentTask = data;
-                
-                // Создаем основной контейнер для задачи
-                const taskContainer = document.createElement('div');
-                taskContainer.className = 'task-container';
-                taskContainer.innerHTML = data.html;
-                responseDiv.appendChild(taskContainer);
+                responseDiv.innerHTML = data.html;
                 
                 // Добавляем кнопку подсказки
-                const hintButton = `
+                responseDiv.insertAdjacentHTML('afterbegin', `
                     <div class="hint">
                         <button type="button" class="hint-btn">
-                            <img class="hint-img" src="static/img/hint.png" alt="hint">
+                            <img class="hint-img" src="/static/img/hint.png" alt="hint">
                         </button>
                     </div>
-                `;
-                responseDiv.insertAdjacentHTML('beforeend', hintButton);
+                `);
                 
-                // Меняем placeholder
+                // Инициализируем кнопку подсказки
+                initHintButton(data.hints);
                 input.placeholder = "Введите ваше решение...";
-                
             } else if (data.type === "verification") {
-                // Проверка решения
-                const resultHTML = `
+                responseDiv.innerHTML = `
                     <div class="verification-result">
                         <h4>Результат проверки:</h4>
                         <div>${data.html}</div>
@@ -287,51 +318,53 @@ document.addEventListener('DOMContentLoaded', () => {
                             '<div class="correct">✓ Решение верное!</div>' : 
                             '<div class="incorrect">✗ Есть ошибки</div>'}
                     </div>
-                    <div class="task-container">${currentTask?.html || ''}</div>
                 `;
+                responseDiv.innerHTML += data.html;
                 
-                responseDiv.innerHTML = resultHTML;
-            }
-            
-            // Инициализируем MathJax один раз после всего
-            if (typeof MathJax !== 'undefined') {
-                MathJax.typesetPromise().then(() => {
-                    console.log('MathJax инициализирован');
-                }).catch(err => {
-                    console.error('Ошибка MathJax:', err);
-                });
-            }
-    
-            // Обработчик для кнопки подсказки
-            const hintBtn = document.querySelector('.hint-btn');
-            if (hintBtn) {
-                let currentHintIndex = 0;
-                hintBtn.addEventListener('click', () => {
-                    const hintsContainer = document.getElementById('hints-container');
-                    const hints = hintsContainer ? hintsContainer.textContent.split('\n') : [];
-    
-                    if (hints.length > 0 && currentHintIndex < hints.length) {
-                        let hintDisplay = document.getElementById('hint-display');
-                        if (!hintDisplay) {
-                            hintDisplay = document.createElement('div');
-                            hintDisplay.id = 'hint-display';
-                            hintDisplay.style.marginTop = '10px';
-                            hintDisplay.style.color = '#666';
-                            responseDiv.appendChild(hintDisplay);
+                if (data.is_correct) {
+                    // Очищаем сессию для новой задачи
+                    fetch('/clear_task', { method: 'POST' })
+                        .then(() => {
+                            input.placeholder = "Введите запрос для новой задачи...";
+                            document.querySelector('.response').innerHTML = 
+                                '<div class="placeholder-text">Здесь появится новая задача...</div>';
+                        });
+                }
+
+                responseDiv.insertAdjacentHTML('afterbegin', `
+                    <div class="hint">
+                        <button type="button" class="hint-btn">
+                            <img class="hint-img" src="/static/img/hint.png" alt="hint">
+                        </button>
+                    </div>
+                `);
+                
+                // Вешаем обработчик на новую кнопку подсказки
+                const hintBtn = document.querySelector('.hint-btn');
+                if (hintBtn) {
+                    let currentHintIndex = 0;
+                    hintBtn.addEventListener('click', () => {
+                        if (data.hints && data.hints.length > 0) {
+                            let hintDisplay = document.getElementById('hint-display');
+                            if (!hintDisplay) {
+                                hintDisplay = document.createElement('div');
+                                hintDisplay.id = 'hint-display';
+                                hintDisplay.style.marginTop = '10px';
+                                hintDisplay.style.color = '#666';
+                                responseDiv.appendChild(hintDisplay);
+                            }
+                            
+                            hintDisplay.innerHTML = `Подсказка ${currentHintIndex + 1}: ${data.hints[currentHintIndex]}`;
+                            currentHintIndex = (currentHintIndex + 1) % data.hints.length;
+                            
+                            if (typeof MathJax !== 'undefined') {
+                                MathJax.typesetPromise([hintDisplay]);
+                            }
                         }
-    
-                        hintDisplay.innerHTML = `Подсказка ${currentHintIndex + 1}: ${hints[currentHintIndex]}`;
-                        currentHintIndex++;
-                        
-                        // Обновляем только новые формулы
-                        MathJax.typesetPromise([hintDisplay]).catch(console.error);
-                    }
-                    
-                    if (currentHintIndex >= hints.length) {
-                        currentHintIndex = 0;
-                    }
-                });
+                    });
+                }
             }
+
     
         } catch (error) {
             console.error('Ошибка:', error);
