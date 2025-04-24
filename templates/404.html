@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Страница не найдена{% endblock %}
+{% block link %}
+<style>
+    .error-container {
+        text-align: center;
+        padding: 50px 20px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .error-code {
+        font-size: 120px;
+        font-weight: bold;
+        color: #3f51b5;
+        margin-bottom: 10px;
+    }
+    .error-message {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+    .home-button {
+        background-color: #3f51b5;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .home-button:hover {
+        background-color: #303f9f;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header">
+    <h1>Ошибка</h1>
+</div>
+<main>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <div class="error-message">Страница не найдена</div>
+        <p>Извините, запрашиваемая страница не существует или была перемещена.</p>
+        <button class="home-button" onclick="window.location.href='/'">На главную</button>
+    </div>
+</main>
+{% endblock %}

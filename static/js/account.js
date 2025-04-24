@@ -2,14 +2,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Инициализация модального окна смены пароля
     const changePasswordModal = document.getElementById('changePasswordModal');
     const changePasswordBtn = document.getElementById('changePasswordBtn');
+    const backBtn = document.getElementById('backBtn');
     const closeModalBtns = document.querySelectorAll('.close');
     
-    // Показать модальное окно
+    // Убедимся, что модальное окно скрыто по умолчанию
+    if (changePasswordModal) {
+        changePasswordModal.style.display = 'none';
+    }
+    
+    // Показать модальное окно при клике на кнопку "Сменить пароль"
     if (changePasswordBtn) {
         changePasswordBtn.addEventListener('click', function() {
             if (changePasswordModal) {
                 changePasswordModal.style.display = 'block';
             }
+        });
+    }
+    
+    // Обработчик для кнопки "Назад"
+    if (backBtn) {
+        backBtn.addEventListener('click', function() {
+            window.location.href = '/student';
         });
     }
 

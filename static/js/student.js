@@ -1,4 +1,164 @@
 
+// Инициализация MathJax при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM загружен, проверяем наличие MathJax");
+    
+    // Проверяем, есть ли активная задача в сессии
+    fetch('/check_active_task')
+        .then(response => response.json())
+        .then(data => {
+            if (data.has_active_task) {
+                // Показываем уведомление, что есть активная задача
+                showNotification('У вас есть активная задача. Для начала новой задачи нажмите кнопку "Следующая задача" после правильного ответа.', 'warning');
+            }
+        })
+        .catch(error => console.error('Ошибка при проверке активной задачи:', error));
+    
+    // Функция для проверки и инициализации MathJax
+    function initMathJax() {
+        if (typeof MathJax !== 'undefined') {
+            console.log("MathJax найден, инициализируем");
+            try {
+                MathJax.typesetPromise()
+                    .then(() => console.log("MathJax успешно инициализирован"))
+                    .catch(err => console.error('MathJax initialization error:', err));
+            } catch (error) {
+                console.error("Ошибка при инициализации MathJax:", error);
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    // Пробуем инициализировать сразу
+    if (!initMathJax()) {
+        console.log("MathJax не найден, ждем загрузки скрипта");
+        // Если MathJax еще не загружен, пробуем через интервал
+        let attempts = 0;
+        const maxAttempts = 10;
+        const interval = setInterval(() => {
+            attempts++;
+            if (initMathJax() || attempts >= maxAttempts) {
+                clearInterval(interval);
+                if (attempts >= maxAttempts && typeof MathJax === 'undefined') {
+                    console.error("MathJax не загрузился после", maxAttempts, "попыток");
+                }
+            }
+        }, 500);
+    }
+});
+
+// Функция для обновления MathJax на странице
+function refreshMathJax(element) {
+    if (typeof MathJax !== 'undefined') {
+        console.log("Вызов refreshMathJax", element ? "для элемента" : "для всей страницы");
+        
+        // Добавляем небольшую задержку для уверенности, что DOM обновился
+        setTimeout(() => {
+            try {
+                // Если передан элемент, обновляем только его
+                if (element) {
+                    MathJax.typesetPromise([element])
+                        .then(() => console.log("MathJax успешно обновлен для элемента"))
+                        .catch(err => console.error('MathJax refresh error:', err));
+                } else {
+                    // Иначе обновляем всю страницу
+                    MathJax.typesetPromise()
+                        .then(() => console.log("MathJax успешно обновлен для всей страницы"))
+                        .catch(err => console.error('MathJax refresh error:', err));
+                }
+            } catch (error) {
+                console.error("Ошибка при обновлении MathJax:", error);
+            }
+        }, 100);
+    } else {
+        console.error("MathJax не определен при вызове refreshMathJax");
+    }
+}
+
+// Функция для отображения уведомлений
+function showNotification(message, type = 'info') {
+    // Создаем элемент уведомления
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    // Стилизуем уведомление
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '10px 20px';
+    notification.style.borderRadius = '5px';
+    notification.style.zIndex = '1000';
+    notification.style.opacity = '0';
+    notification.style.transition = 'opacity 0.3s ease-in-out';
+    
+    // Устанавливаем цвет в зависимости от типа
+    if (type === 'success') {
+        notification.style.backgroundColor = '#4CAF50';
+        notification.style.color = 'white';
+    } else if (type === 'warning') {
+        notification.style.backgroundColor = '#FF9800';
+        notification.style.color = 'white';
+    } else if (type === 'error') {
+        notification.style.backgroundColor = '#F44336';
+        notification.style.color = 'white';
+    } else {
+        notification.style.backgroundColor = '#2196F3';
+        notification.style.color = 'white';
+    }
+    
+    // Добавляем уведомление в body
+    document.body.appendChild(notification);
+    
+    // Показываем уведомление
+    setTimeout(() => {
+        notification.style.opacity = '1';
+    }, 10);
+    
+    // Скрываем и удаляем уведомление через 3 секунды
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Функция для открытия предпросмотра изображения
+window.openImagePreview = function(src) {
+    // Создаем модальное окно для просмотра изображения
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
+    
+    // Создаем изображение
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.maxWidth = '90%';
+    img.style.maxHeight = '90%';
+    img.style.objectFit = 'contain';
+    
+    // Добавляем изображение в модальное окно
+    modal.appendChild(img);
+    
+    // Закрытие модального окна при клике
+    modal.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Добавляем модальное окно в body
+    document.body.appendChild(modal);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.querySelector('.request');
     
@@ -145,10 +305,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const compressedFile = await compressImage(file);
                     const base64 = await readFileAsBase64(compressedFile);
                     results.push({
-                        type: 'image',
-                        name: file.name,
-                        data: base64,
-                        mimeType: 'image/jpeg' // Все изображения конвертируем в JPEG
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/jpeg",
+                            "data": base64
+                        }
                     });
                 } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
                     const text = await readFileAsText(file);
@@ -160,10 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const base64 = await readFileAsBase64(file);
                     results.push({
-                        type: 'binary',
-                        name: file.name,
+                        type: 'image', // Изменяем тип на image для совместимости
+                        mimeType: file.type,
                         data: base64,
-                        mimeType: file.type
+                        name: file.name
                     });
                 }
             } catch (error) {
@@ -224,34 +386,94 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function displayFiles(filesData) {
-        const filesContainer = document.querySelector('.files-container');
-        filesContainer.innerHTML = '';
+function displayFiles(filesData) {
+    // Проверяем существование контейнера для файлов
+    let filesContainer = document.querySelector('.files-container');
+    
+    // Если контейнер не существует, создаем его
+    if (!filesContainer) {
+        filesContainer = document.createElement('div');
+        filesContainer.className = 'files-container';
         
-        if (!filesData || filesData.length === 0) return;
+        // Создаем родительский элемент, если его нет
+        let taskFiles = document.getElementById('taskFiles');
+        if (!taskFiles) {
+            taskFiles = document.createElement('div');
+            taskFiles.id = 'taskFiles';
+            taskFiles.style.display = 'none';
+            
+            // Проверяем существование элемента response
+            const responseDiv = document.querySelector('.response');
+            if (responseDiv) {
+                responseDiv.appendChild(taskFiles);
+            } else {
+                // Если элемент response не существует, создаем его
+                const responseContainer = document.createElement('div');
+                responseContainer.className = 'response';
+                responseContainer.appendChild(taskFiles);
+                
+                // Добавляем его в .common или в body, если .common не существует
+                const commonDiv = document.querySelector('.common');
+                if (commonDiv) {
+                    commonDiv.appendChild(responseContainer);
+                } else {
+                    document.body.appendChild(responseContainer);
+                }
+            }
+        }
         
-        document.getElementById('taskFiles').style.display = 'block';
+        taskFiles.appendChild(filesContainer);
+    }
+    
+    // Очищаем контейнер
+    filesContainer.innerHTML = '';
+    
+    if (!filesData || filesData.length === 0) return;
+    
+    // Показываем контейнер файлов
+    const taskFiles = document.getElementById('taskFiles');
+    if (taskFiles) taskFiles.style.display = 'block';
         
         filesData.forEach(file => {
             const fileElement = document.createElement('div');
             fileElement.className = 'file-item';
             
             if (file.type === 'image') {
-                fileElement.innerHTML = `
-                    <img src="data:${file.mimeType};base64,${file.data}" 
-                         alt="${file.name}" 
-                         style="max-width: 300px; max-height: 200px; cursor: pointer;"
-                         onclick="openFilePreview('data:${file.mimeType};base64,${file.data}')">
-                    <p>${file.name}</p>
-                `;
+                // Проверяем, в новом ли формате файл
+                if (file.source && file.source.type === 'base64') {
+                    fileElement.innerHTML = `
+                        <img src="data:${file.source.media_type};base64,${file.source.data}" 
+                             alt="Изображение" 
+                             style="max-width: 300px; max-height: 200px; cursor: pointer;"
+                             onclick="window.openImagePreview('data:${file.source.media_type};base64,${file.source.data}')">
+                        <p>Изображение</p>
+                    `;
+                } else {
+                    fileElement.innerHTML = `
+                        <img src="data:${file.mimeType};base64,${file.data}" 
+                             alt="${file.name || 'Изображение'}" 
+                             style="max-width: 300px; max-height: 200px; cursor: pointer;"
+                             onclick="window.openImagePreview('data:${file.mimeType};base64,${file.data}')">
+                        <p>${file.name}</p>
+                    `;
+                }
             } else {
-                fileElement.innerHTML = `
-                    <a href="data:${file.mimeType};base64,${file.data}" 
-                       download="${file.name}" 
-                       class="file-link">
-                        📄 ${file.name}
-                    </a>
-                `;
+                // Проверяем, есть ли mimeType и data
+                if (file.mimeType && file.data) {
+                    fileElement.innerHTML = `
+                        <a href="data:${file.mimeType};base64,${file.data}" 
+                           download="${file.name || 'file'}" 
+                           class="file-link">
+                            📄 ${file.name || 'Файл'}
+                        </a>
+                    `;
+                } else {
+                    fileElement.innerHTML = `
+                        <div class="file-link">
+                            📄 ${file.name || 'Файл'}
+                        </div>
+                    `;
+                }
             }
             
             filesContainer.appendChild(fileElement);
@@ -262,7 +484,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.submitForm = async function() {
         const input = document.getElementById('userInput');
-        const loading = document.getElementById('loading');
+        
+        // Проверяем существование элемента loading
+        let loading = document.getElementById('loading');
+        if (!loading) {
+            loading = document.createElement('div');
+            loading.id = 'loading';
+            loading.style.display = 'none';
+            loading.innerHTML = '<div class="spinner"></div><p>Загрузка...</p>';
+            document.querySelector('.common').appendChild(loading);
+        }
+        
+        // Проверяем существование элемента responseDiv
         const responseDiv = document.querySelector('.response');
         
         if (!input.value.trim() && selectedFiles.length === 0) {
@@ -271,7 +504,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     
         loading.style.display = 'flex';
-        responseDiv.innerHTML = '';
+        
+        // Проверяем существование responseDiv перед установкой innerHTML
+        if (responseDiv) {
+            responseDiv.innerHTML = '';
+        }
 
         // Добавим эту функцию для инициализации кнопки подсказки
         function initHintButton(hints) {
@@ -325,25 +562,41 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Полученные данные:", data);
             
             // Очищаем предыдущий контент
-            responseDiv.innerHTML = '';
+            if (responseDiv) {
+                responseDiv.innerHTML = '';
+            }
             
             if (data.type === "task") {
                 currentTask = data;
-                responseDiv.innerHTML = data.html;
-                
-                // Добавляем кнопку подсказки
-                responseDiv.insertAdjacentHTML('afterbegin', `
-                    <div class="hint">
-                        <button type="button" class="hint-btn">
-                            <img class="hint-img" src="/static/img/hint.png" alt="hint">
-                        </button>
-                    </div>
-                `);
-                
-                // Инициализируем кнопку подсказки
-                initHintButton(data.hints);
-                input.placeholder = "Введите ваше решение...";
-            } else if (data.type === "verification") {
+                if (responseDiv) {
+                    responseDiv.innerHTML = data.html;
+                    
+                    // Добавляем кнопку подсказки
+                    responseDiv.insertAdjacentHTML('afterbegin', `
+                        <div class="hint">
+                            <button type="button" class="hint-btn">
+                                <img class="hint-img" src="/static/img/hint.png" alt="hint">
+                            </button>
+                        </div>
+                    `);
+                    
+                    // Инициализируем кнопку подсказки
+                    initHintButton(data.hints);
+                    input.placeholder = "Введите ваше решение...";
+                    
+                    // Обрабатываем математические формулы с помощью MathJax
+                    if (typeof MathJax !== 'undefined') {
+                        console.log("Запуск обработки MathJax для задачи");
+                        setTimeout(() => {
+                            MathJax.typesetPromise([responseDiv]).then(() => {
+                                console.log("MathJax успешно обработал формулы");
+                            }).catch(err => console.error('MathJax error:', err));
+                        }, 100); // Небольшая задержка для уверенности, что DOM обновился
+                    } else {
+                        console.error("MathJax не определен при обработке задачи");
+                    }
+                }
+            } else if (data.type === "verification" && responseDiv) {
                 responseDiv.innerHTML = `
                     <div class="verification-result">
                         <h4>Результат проверки:</h4>
@@ -353,16 +606,55 @@ document.addEventListener('DOMContentLoaded', () => {
                             '<div class="incorrect">✗ Есть ошибки</div>'}
                     </div>
                 `;
-                responseDiv.innerHTML += data.task_html;
-                
-                if (data.is_correct) {
-                    // Очищаем сессию для новой задачи
-                    fetch('/clear_task', { method: 'POST' })
-                        .then(() => {
-                            input.placeholder = "Введите запрос для новой задачи...";
-                            document.querySelector('.response').innerHTML = 
-                                '<div class="placeholder-text">Здесь появится новая задача...</div>';
-                        });
+                if (responseDiv) {
+                    responseDiv.innerHTML += data.task_html;
+                    
+                        if (data.is_correct) {
+                            // Добавляем сообщение о необходимости нажать кнопку
+                            const instructionMsg = document.createElement('div');
+                            instructionMsg.className = 'instruction-message';
+                            instructionMsg.innerHTML = '<strong>Внимание!</strong> Чтобы начать новую задачу, нажмите кнопку "Следующая задача" ниже.';
+                            instructionMsg.style.color = '#ff5722';
+                            instructionMsg.style.padding = '10px';
+                            instructionMsg.style.margin = '10px 0';
+                            instructionMsg.style.backgroundColor = '#fff3e0';
+                            instructionMsg.style.borderRadius = '5px';
+                            instructionMsg.style.textAlign = 'center';
+                            
+                            // Добавляем кнопку "Следующая задача"
+                            const nextTaskBtn = document.createElement('button');
+                            nextTaskBtn.className = 'next-task-btn';
+                            nextTaskBtn.textContent = 'Следующая задача';
+                            
+                            nextTaskBtn.addEventListener('click', () => {
+                                // Очищаем сессию для новой задачи
+                                fetch('/clear_task', { method: 'POST' })
+                                    .then(() => {
+                                        input.placeholder = "Введите запрос для новой задачи...";
+                                        const respDiv = document.querySelector('.response');
+                                        if (respDiv) {
+                                            respDiv.innerHTML = '<div class="placeholder-text">Здесь появится новая задача...</div>';
+                                        }
+                                        // Показываем уведомление об успешной очистке
+                                        showNotification('Сессия очищена. Теперь вы можете начать новую задачу!', 'success');
+                                    });
+                            });
+                            
+                            responseDiv.appendChild(instructionMsg);
+                            responseDiv.appendChild(nextTaskBtn);
+                        }
+                    
+                    // Обрабатываем математические формулы с помощью MathJax
+                    if (typeof MathJax !== 'undefined') {
+                        console.log("Запуск обработки MathJax для результата проверки");
+                        setTimeout(() => {
+                            MathJax.typesetPromise([responseDiv]).then(() => {
+                                console.log("MathJax успешно обработал формулы в результате проверки");
+                            }).catch(err => console.error('MathJax error:', err));
+                        }, 100); // Небольшая задержка для уверенности, что DOM обновился
+                    } else {
+                        console.error("MathJax не определен при обработке результата проверки");
+                    }
                 }
 
                 responseDiv.insertAdjacentHTML('afterbegin', `
@@ -402,7 +694,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
         } catch (error) {
             console.error('Ошибка:', error);
-            responseDiv.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
+            if (responseDiv) {
+                responseDiv.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
+            }
         } finally {
             loading.style.display = 'none';
             input.value = '';
