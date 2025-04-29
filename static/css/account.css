@@ -1,173 +1,281 @@
+/* Импорт шрифтов */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+/* Основные переменные */
+:root {
+    --primary-color: #4a6bff;
+    --primary-light: #7986cb;
+    --primary-dark: #303f9f;
+    --accent-color: #00bcd4;
+    --text-light: #e3f2fd;
+    --text-dark: #263238;
+    --error-color: #f44336;
+    --success-color: #4CAF50;
+    --warning-color: #FF9800;
+    --background-gradient: linear-gradient(135deg, #4a6bff, #6e8eff);
+    --card-background: rgba(255, 255, 255, 0.95);
+    --transition-speed: 0.3s;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 20px;
+}
+
+/* Общие стили */
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><path fill="rgba(255,255,255,0.05)" d="M30,10L50,30L70,10L90,30L70,50L90,70L70,90L50,70L30,90L10,70L30,50L10,30Z"/></svg>'), var(--background-gradient);
+    background-size: 300px, cover;
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    animation: backgroundPulse 15s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundPulse {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+/* Стили для контейнера личного кабинета */
 .account-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    color: #fff;
-}
-
-.user-info {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    color: var(--text-light);
     background: rgba(255, 255, 255, 0.1);
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 
+                0 1px 3px rgba(0, 0, 0, 0.1),
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 0.8s ease-out;
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.account-container h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
+}
+
+/* Стили для информации о пользователе */
+.user-info {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--accent-color);
+    transition: all 0.3s ease;
+    animation: slideIn 0.5s ease-out;
+}
+
+.user-info:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.user-info p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.user-info strong {
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Стили для секции статистики */
 .stats-section {
-    margin-bottom: 30px;
+    margin-bottom: 2.5rem;
+    animation: slideUp 0.7s ease-out;
 }
 
+.stats-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: inline-block;
+}
+
+.stats-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), transparent);
+    border-radius: 3px;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для таблицы */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+table:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
 }
 
 th, td {
-    padding: 12px;
+    padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 th {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
 }
 
-/* Добавим для кнопок */
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Стилизация процента в таблице */
+td:last-child {
+    font-weight: 600;
+}
+
+/* Стили для кнопок */
 .account-actions {
     display: flex;
-    gap: 15px;
-    margin-top: 30px;
+    gap: 1rem;
+    margin-top: 2rem;
+    animation: fadeIn 1s ease-out;
 }
 
 .account-actions button {
-    padding: 10px 20px;
+    flex: 1;
+    padding: 0.9rem 1.5rem;
     border: none;
-    border-radius: 5px;
+    border-radius: var(--border-radius-md);
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.account-actions button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.account-actions button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.account-actions button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s;
+}
+
+.account-actions button:hover::before {
+    left: 100%;
+}
+
+#backBtn {
+    background: linear-gradient(135deg, #2196F3, #0d47a1);
+    color: white;
+}
+
+#backBtn::before {
+    content: '←';
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
 }
 
 #changePasswordBtn {
-    background: #4CAF50;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
 }
 
 #logoutBtn {
-    background: #f44336;
+    background: linear-gradient(135deg, #f44336, #c62828);
     color: white;
-}
-
-/* Спиннер для кнопки */
-.spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-.account-actions button:hover {
-    background: #0056b3;
-}
-
-/* Добавим в account.css */
-/* Стили для формы смены пароля */
-#changePasswordForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-#changePasswordForm label {
-    font-weight: bold;
-}
-
-#changePasswordForm input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-}
-
-#changePasswordForm input.error {
-    border-color: #ff4444;
-}
-
-.error-message {
-    color: #ff4444;
-    font-size: 12px;
-    min-height: 18px;
-}
-
-#submitPasswordChange {
-    padding: 10px;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-#submitPasswordChange:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
-.notification-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    max-width: 300px;
-}
-
-.notification {
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.notification.success {
-    background-color: #4CAF50;
-}
-
-.notification.error {
-    background-color: #F44336;
-}
-
-.notification-close {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    margin-left: 10px;
 }
 
 /* Стили для модального окна */
@@ -179,42 +287,253 @@ th {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
     background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+/* Когда модальное окно отображается */
+.modal[style*="display: block"] {
+    opacity: 1;
 }
 
 .modal-content {
-    background-color: rgb(0, 0, 177);
+    background: linear-gradient(135deg, var(--primary-dark), #1a237e);
     margin: 10% auto;
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    width: 80%;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    width: 90%;
     max-width: 500px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     position: relative;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    animation: modalSlideIn 0.5s forwards;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes modalSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-70px) scale(0.95);
+    }
+    70% {
+        transform: translateY(10px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-content h3 {
+    color: white;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    text-align: center;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+    position: absolute;
+    right: 1.2rem;
+    top: 1.2rem;
+    font-size: 1.8rem;
     cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-.close:hover,
-.close:focus {
+.close:hover {
     color: white;
-    text-decoration: none;
+    transform: rotate(90deg);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Стиль для кнопки "Назад" */
-#backBtn {
-    background: #2196F3;
+/* Стили для формы смены пароля */
+#changePasswordForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#changePasswordForm label {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+}
+
+#changePasswordForm input {
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-md);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
 }
 
-#backBtn:hover {
-    background: #0b7dda;
+#changePasswordForm input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
+}
+
+#changePasswordForm input.error {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.85rem;
+    min-height: 1.2rem;
+    font-weight: 500;
+}
+
+#submitPasswordChange {
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--accent-color), #0097a7);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: var(--shadow-md);
+}
+
+#submitPasswordChange:hover {
+    background: linear-gradient(135deg, #0097a7, var(--accent-color));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+#submitPasswordChange:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Стили для спиннера */
+.spinner {
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Стили для уведомлений */
+.notification-container {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10000;
+    max-width: 350px;
+}
+
+.notification {
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius-md);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-lg);
+    animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    backdrop-filter: blur(5px);
+    border-left: 4px solid;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification.success {
+    background-color: rgba(76, 175, 80, 0.9);
+    border-left-color: #2e7d32;
+}
+
+.notification.error {
+    background-color: rgba(244, 67, 54, 0.9);
+    border-left-color: #c62828;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.notification-close:hover {
+    transform: scale(1.2);
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .account-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .account-container h2 {
+        font-size: 1.8rem;
+    }
+    
+    .account-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+    
+    th, td {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
 }

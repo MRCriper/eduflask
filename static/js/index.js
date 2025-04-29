@@ -27,6 +27,17 @@ function initAuthButtons() {
             showAuthModal('login');
         });
     }
+    
+    // Инициализация кнопок закрытия (крестиков)
+    const closeBtns = document.querySelectorAll('.close');
+    closeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
 }
 
 // ======================
@@ -36,6 +47,9 @@ function showAuthModal(type) {
     const modal = document.getElementById(`${type}Modal`);
     if (modal) {
         modal.style.display = 'block';
+        
+        // Анимация появления
+        modal.classList.add('modal-active');
         
         // Инициализация формы внутри модального окна
         initAuthForm(type);

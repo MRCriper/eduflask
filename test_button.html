@@ -1,0 +1,130 @@
+к<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест кнопки отправки</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #3949ab;
+            color: white;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .common {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 95%;
+            height: 75vh;
+            justify-content: end;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        #requestForm {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .request {
+            width: 100%;
+            min-height: 32px;
+            max-height: 150px;
+            border-radius: 20px;
+            background-color: aquamarine;
+            border: none;
+            line-height: 1.5;
+            resize: none;
+            overflow-y: auto;
+            padding: 8px 40px 8px 40px;
+            box-sizing: border-box;
+            font-size: 16px;
+            scrollbar-width: none;
+            transition: height 0.2s ease-out;
+        }
+
+        .request::-webkit-scrollbar {
+            display: none;
+        }
+
+        .request:focus {
+            border: none;
+            outline: none;
+        }
+
+        .attach-btn, .send {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+        }
+
+        .attach-btn:hover, .send:hover {
+            transform: translateY(-50%);
+            box-shadow: none;
+        }
+
+        .send {
+            right: 8px;
+        }
+
+        .attach-btn {
+            left: 4px;
+        }
+
+        #requestForm:hover .send, #requestForm:hover .attach-btn {
+            opacity: 1;
+        }
+
+        .attach-img, .send-img {
+            width: 24px;
+            height: 24px;
+            display: block;
+            box-shadow: none;
+            filter: none;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="common">
+            <form id="requestForm" onsubmit="return false;">
+                <label for="fileInput" class="attach-btn">
+                    <img class="attach-img" src="static/img/clip.png" alt="attach">
+                </label>
+                <input type="file" id="fileInput" style="display: none;" multiple>
+                <textarea id="userInput" name='request' placeholder="Введите запрос..." class="request" required></textarea>
+                <button type="button" onclick="alert('Кнопка отправки работает!')" class="send">
+                    <img class="send-img" src="static/img/send.png" alt="snd">
+                </button>
+                <div id="filePreview" class="file-preview"></div>                   
+            </form>
+        </div>
+    </main>
+</body>
+</html>

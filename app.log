@@ -928,3 +928,307 @@ FileNotFoundError: [Errno 2] No such file or directory: '/usr/share/fonts/truety
 2025-04-24 23:56:08,493 - werkzeug - INFO - 127.0.0.1 - - [24/Apr/2025 23:56:08] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
 2025-04-24 23:56:08,605 - werkzeug - INFO - 127.0.0.1 - - [24/Apr/2025 23:56:08] "GET /check_active_task HTTP/1.1" 200 -
 2025-04-24 23:56:08,607 - werkzeug - INFO - 127.0.0.1 - - [24/Apr/2025 23:56:08] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:00,178 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 00:24:00,179 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 00:24:02,404 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:02] "GET / HTTP/1.1" 200 -
+2025-04-30 00:24:02,525 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:02] "[36mGET /static/js/index.js HTTP/1.1[0m" 304 -
+2025-04-30 00:24:02,526 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:02] "GET /static/css/base.css HTTP/1.1" 200 -
+2025-04-30 00:24:02,528 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:02] "[36mGET /static/css/index.css HTTP/1.1[0m" 304 -
+2025-04-30 00:24:03,787 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:03] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 00:24:03,789 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:03] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:19,355 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:19] "POST /login HTTP/1.1" 200 -
+2025-04-30 00:24:20,901 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:20] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:24:20,948 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:20] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:24:20,962 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:20] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 00:24:20,967 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:20] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:20,968 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:20] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:24:20,969 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:20] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:21,493 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:21] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:21,694 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:21] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:24:21,704 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:21] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:23,962 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:23] "GET /account HTTP/1.1" 200 -
+2025-04-30 00:24:24,011 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:24] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:24:24,012 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:24] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 00:24:24,015 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:24] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 00:24:24,656 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:24] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:31,354 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:31] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:24:31,413 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:31] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:24:31,415 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:31] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:24:31,417 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:31] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:24:31,420 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:31] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:31,421 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:31] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:32,065 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:32] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:24:32,213 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:32] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:24:32,218 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:24:32] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:30:59,507 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 00:30:59,509 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 00:31:01,217 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:01] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:31:01,351 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:01] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:01,352 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:01] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:01,356 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:01] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:01,359 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:01] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:01,360 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:01] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 00:31:01,955 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:01] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:02,018 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:02] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:31:02,030 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:02] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:02,049 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:02] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,357 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:31:03,400 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,403 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,405 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,406 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,410 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,616 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,738 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:31:03,743 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:03,761 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:03] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:08,262 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:08] "GET /account HTTP/1.1" 200 -
+2025-04-30 00:31:08,300 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:08] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:08,311 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:08] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:08,312 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:08] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:08,602 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:08] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:10,183 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:10] "POST /logout HTTP/1.1" 200 -
+2025-04-30 00:31:10,206 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:10] "GET / HTTP/1.1" 200 -
+2025-04-30 00:31:10,241 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:10] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:10,243 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:10] "GET /static/css/index.css HTTP/1.1" 200 -
+2025-04-30 00:31:10,244 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:10] "GET /static/js/index.js HTTP/1.1" 200 -
+2025-04-30 00:31:10,514 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:10] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 00:31:10,516 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:10] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:12,575 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:12] "GET / HTTP/1.1" 200 -
+2025-04-30 00:31:12,616 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:12] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:12,620 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:12] "[36mGET /static/css/index.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:12,622 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:12] "[36mGET /static/js/index.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:12,891 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:12] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 00:31:12,894 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:12] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:12,912 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:12] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:30,981 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:30] "POST /login HTTP/1.1" 200 -
+2025-04-30 00:31:40,637 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:40] "POST /login HTTP/1.1" 200 -
+2025-04-30 00:31:42,163 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:31:42,221 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:42,223 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:42,225 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:42,228 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:42,232 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:42,478 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:42,569 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:31:42,576 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:42] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:44,937 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:44] "GET /account HTTP/1.1" 200 -
+2025-04-30 00:31:44,983 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:44] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:44,985 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:44] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:44,986 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:44] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:45,301 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:45] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:46,155 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:31:46,196 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:46,199 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:46,201 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:46,202 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:46,204 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:46,415 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:46,508 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:31:46,515 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:46] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:51,642 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:51] "GET /account HTTP/1.1" 200 -
+2025-04-30 00:31:51,694 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:51] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:51,694 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:51] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:51,695 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:51] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:51,957 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:51] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:53,188 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:31:53,227 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:53,230 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:53,232 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:53,234 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:53,236 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:53,458 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:53,555 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:31:53,561 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:53] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:54,687 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:54] "GET /account HTTP/1.1" 200 -
+2025-04-30 00:31:54,731 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:54] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:54,734 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:54] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:54,736 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:54] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:55,009 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:55] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:58,552 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:31:58,600 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:58,604 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:31:58,605 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:31:58,607 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:58,607 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:58,801 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:31:58,888 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:31:58,893 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:31:58] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:35:09,560 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 00:35:09,560 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 00:35:55,460 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 00:35:55,461 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 00:36:29,776 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:36:29] "[32mGET /student HTTP/1.1[0m" 302 -
+2025-04-30 00:36:29,790 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:36:29] "GET / HTTP/1.1" 200 -
+2025-04-30 00:36:30,278 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:36:30] "GET /static/js/index.js HTTP/1.1" 200 -
+2025-04-30 00:36:30,279 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:36:30] "GET /static/css/base.css HTTP/1.1" 200 -
+2025-04-30 00:36:30,280 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:36:30] "GET /static/css/index.css HTTP/1.1" 200 -
+2025-04-30 00:36:31,044 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:36:31] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 00:36:31,296 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:36:31] "GET /static/img/icon.png HTTP/1.1" 200 -
+2025-04-30 00:38:55,379 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:55] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:38:55,423 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:55] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:38:55,433 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:55] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:38:55,433 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:55] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 00:38:55,434 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:55] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:38:55,435 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:55] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:38:56,110 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:56] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:38:56,350 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:56] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:38:56,353 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:56] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:38:56,395 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:38:56] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:42:19,166 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:19] "GET /account HTTP/1.1" 200 -
+2025-04-30 00:42:19,206 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:19] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:42:19,207 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:19] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 00:42:19,210 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:19] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 00:42:19,583 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:19] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:42:22,281 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:42:22,340 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:42:22,341 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:42:22,345 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:42:22,349 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:42:22,352 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:42:22,550 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:42:22,661 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:42:22,668 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:42:22] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:54:10,519 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 00:54:10,520 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 00:54:13,004 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "GET /student HTTP/1.1" 200 -
+2025-04-30 00:54:13,127 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:54:13,142 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 00:54:13,150 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 00:54:13,152 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 00:54:13,152 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 00:54:13,731 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 00:54:13,966 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 00:54:13,976 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:13] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:54:14,015 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:14] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 00:54:35,857 - httpx - INFO - HTTP Request: POST https://api.langdock.com/anthropic/eu/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-04-30 00:54:35,859 - __main__ - ERROR - Ошибка в функции get_response: Error code: 401 - {'message': 'The provided API key is invalid.'}
+2025-04-30 00:54:35,859 - __main__ - WARNING - Не найдены маркеры блока кода в ответе AI
+2025-04-30 00:54:36,584 - httpx - INFO - HTTP Request: POST https://api.langdock.com/anthropic/eu/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-04-30 00:54:36,586 - __main__ - ERROR - Ошибка в функции get_response: Error code: 401 - {'message': 'The provided API key is invalid.'}
+2025-04-30 00:54:36,587 - __main__ - WARNING - Не найдены маркеры блока кода в ответе AI
+2025-04-30 00:54:37,231 - httpx - INFO - HTTP Request: POST https://api.langdock.com/anthropic/eu/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-04-30 00:54:37,233 - __main__ - ERROR - Ошибка в функции get_response: Error code: 401 - {'message': 'The provided API key is invalid.'}
+2025-04-30 00:54:37,233 - __main__ - WARNING - Не найдены маркеры блока кода в ответе AI
+2025-04-30 00:54:37,235 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:37] "POST /student HTTP/1.1" 200 -
+2025-04-30 00:54:39,798 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:39] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 00:54:39,801 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:54:39] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 00:58:59,782 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:58:59] "[32mGET /student HTTP/1.1[0m" 302 -
+2025-04-30 00:58:59,792 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:58:59] "GET / HTTP/1.1" 200 -
+2025-04-30 00:59:00,186 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:59:00] "GET /static/css/base.css HTTP/1.1" 200 -
+2025-04-30 00:59:00,187 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:59:00] "GET /static/css/index.css HTTP/1.1" 200 -
+2025-04-30 00:59:00,188 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:59:00] "GET /static/js/index.js HTTP/1.1" 200 -
+2025-04-30 00:59:00,991 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:59:00] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 00:59:01,241 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 00:59:01] "GET /static/img/icon.png HTTP/1.1" 200 -
+2025-04-30 01:00:00,345 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:00] "GET /account HTTP/1.1" 200 -
+2025-04-30 01:00:00,387 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:00] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:00,390 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:00] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:00,391 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:00] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 01:00:01,216 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:01] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:00:03,015 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:03] "POST /logout HTTP/1.1" 200 -
+2025-04-30 01:00:03,027 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:03] "GET / HTTP/1.1" 200 -
+2025-04-30 01:00:03,070 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:03] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:03,073 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:03] "[36mGET /static/css/index.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:03,073 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:03] "[36mGET /static/js/index.js HTTP/1.1[0m" 304 -
+2025-04-30 01:00:03,419 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:03] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 01:00:03,423 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:03] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:00:07,095 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:07] "POST /login HTTP/1.1" 200 -
+2025-04-30 01:00:10,665 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:10] "POST /register HTTP/1.1" 200 -
+2025-04-30 01:00:42,587 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:42] "POST /login HTTP/1.1" 200 -
+2025-04-30 01:00:44,126 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "GET /student HTTP/1.1" 200 -
+2025-04-30 01:00:44,175 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:44,180 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 01:00:44,181 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 01:00:44,181 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 01:00:44,183 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 01:00:44,436 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 01:00:44,620 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 01:00:44,629 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:44] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:00:45,724 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:45] "GET /account HTTP/1.1" 200 -
+2025-04-30 01:00:45,765 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:45] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:45,768 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:45] "[36mGET /static/css/account.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:45,770 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:45] "[36mGET /static/js/account.js HTTP/1.1[0m" 304 -
+2025-04-30 01:00:46,052 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:46] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:00:47,211 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:47] "POST /logout HTTP/1.1" 200 -
+2025-04-30 01:00:47,225 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:47] "GET / HTTP/1.1" 200 -
+2025-04-30 01:00:47,274 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:47] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:47,277 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:47] "[36mGET /static/css/index.css HTTP/1.1[0m" 304 -
+2025-04-30 01:00:47,278 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:47] "[36mGET /static/js/index.js HTTP/1.1[0m" 304 -
+2025-04-30 01:00:47,590 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:47] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 01:00:47,597 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:00:47] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:03:11,981 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 01:03:11,981 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 01:03:17,383 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:17] "POST /login HTTP/1.1" 200 -
+2025-04-30 01:03:18,938 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:18] "GET /student HTTP/1.1" 200 -
+2025-04-30 01:03:19,102 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:03:19,109 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 01:03:19,110 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 01:03:19,112 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 01:03:19,113 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "[36mGET /static/css/student.css HTTP/1.1[0m" 304 -
+2025-04-30 01:03:19,236 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 01:03:19,325 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 01:03:19,340 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:03:19] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:09:47,506 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 01:09:47,507 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 01:09:56,135 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "GET /student HTTP/1.1" 200 -
+2025-04-30 01:09:56,271 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:09:56,295 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 01:09:56,300 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 01:09:56,301 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 01:09:56,303 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 01:09:56,488 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 01:09:56,545 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 01:09:56,558 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:09:56,577 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:09:56] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:13:58,628 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 01:13:58,629 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 01:13:59,608 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:13:59] "GET /student HTTP/1.1" 200 -
+2025-04-30 01:13:59,786 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:13:59] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:13:59,788 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:13:59] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 01:13:59,789 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:13:59] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 01:13:59,792 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:13:59] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 01:13:59,793 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:13:59] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 01:13:59,971 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:13:59] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 01:14:00,028 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:14:00] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 01:14:00,041 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:14:00] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:14:00,068 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:14:00] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:22,510 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 01:15:22,511 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 01:15:24,970 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:24] "GET /student HTTP/1.1" 200 -
+2025-04-30 01:15:25,124 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:15:25,137 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 01:15:25,141 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:25,142 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:25,143 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 01:15:25,312 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:25,399 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 01:15:25,403 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:25,422 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:25] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:44,479 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-04-30 01:15:44,480 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-30 01:15:47,389 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "GET /student HTTP/1.1" 200 -
+2025-04-30 01:15:47,544 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
+2025-04-30 01:15:47,563 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "[36mGET /static/img/user.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:47,565 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "[36mGET /static/img/clip.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:47,566 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "GET /static/css/student.css HTTP/1.1" 200 -
+2025-04-30 01:15:47,566 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "[36mGET /static/js/student.js HTTP/1.1[0m" 304 -
+2025-04-30 01:15:47,684 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "[36mGET /static/img/send.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:47,781 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "GET /check_active_task HTTP/1.1" 200 -
+2025-04-30 01:15:47,788 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:15:47,807 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:15:47] "[36mGET /static/img/icon.png HTTP/1.1[0m" 304 -
+2025-04-30 01:20:52,054 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:20:52] "GET / HTTP/1.1" 200 -
+2025-04-30 01:20:52,066 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:20:52] "GET /static/css/base.css HTTP/1.1" 200 -
+2025-04-30 01:20:52,475 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:20:52] "GET /static/css/index.css HTTP/1.1" 200 -
+2025-04-30 01:20:52,476 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:20:52] "GET /static/js/index.js HTTP/1.1" 200 -
+2025-04-30 01:20:52,958 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:20:52] "GET /check_auth HTTP/1.1" 200 -
+2025-04-30 01:20:53,207 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:20:53] "GET /static/img/icon.png HTTP/1.1" 200 -
