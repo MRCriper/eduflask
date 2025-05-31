@@ -131,7 +131,7 @@ def get_response(text, files=None):
             ],
             max_tokens=10240,
         )
-        print(completion_0.content[0].text)
+        print(completion_0.choices[0].message.content)
 
         completion_last = client.chat.completions.create(
             model="anthropic/claude-sonnet-4-20250514",
