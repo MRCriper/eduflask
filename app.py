@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, session, redirect
 from flask import request as rq
 from flask_sqlalchemy import SQLAlchemy
-from anthropic import Anthropic
+from openai import OpenAI
 from datetime import datetime
 import os
 from sqlalchemy.orm import Session
@@ -35,9 +35,9 @@ load_dotenv()
 
 def get_response(text, files=None):
     try:
-        client = Anthropic(
-            base_url=os.environ.get("ANTHROPIC_BASE_URL", "https://api.langdock.com/anthropic/eu/"),
-            api_key=os.environ.get("ANTHROPIC_API_KEY", "sk-1iCzcjVTrzPv0rFDPIiQd8TeXvTr-byoebkaigwZF0GXXbqYc3zjvL04K5H6YpIIjoYLWahO0FC1n2BPgtieKw")
+        client = OpenAI(
+            base_url="https://api.zeroeval.com/proxy",
+            api_key=os.environ.get("ZEROEVAL_API_KEY")
         )
         
         # Переменная для хранения результата обработки изображений
@@ -71,8 +71,8 @@ def get_response(text, files=None):
                     })
         
             # Обрабатываем файлы и сохраняем результат
-            completion_image = client.messages.create(
-                model="claude-3-7-sonnet-20250219",
+            completion_image = client.chat.completions.create(
+                model="anthropic/claude-sonnet-4-20250514",
                 messages=[
                     {"role": "user", "content": [
                                 {"type": "text", "text": 'Представь, что ты учитель и тебе нужно максимально понятно объяснить что-то своим ученикам. Описывай подробно, как ты приходишь к тому или иному действию. ВАЖНО: отвечай только на русском языке.' + f"Запрос пользователя: {text}"},
@@ -85,8 +85,8 @@ def get_response(text, files=None):
             image_result = completion_image.content[0].text
         
         # Сначала определяем предмет задачи
-        subject_response = client.messages.create(
-            model="claude-3-7-sonnet-20250219",
+        subject_response = client.chat.completions.create(
+            model="anthropic/claude-sonnet-4-20250514",
             messages=[
                 {
                     "role": "user",
@@ -109,8 +109,8 @@ def get_response(text, files=None):
         subject = subject if subject in valid_subjects else "Другое"
         logger.info(f"Определен предмет: {subject}")
 
-        completion_0 = client.messages.create(
-            model="claude-3-7-sonnet-20250219",
+        completion_0 = client.chat.completions.create(
+            model="anthropic/claude-sonnet-4-20250514",
             messages=[
                 {
                     "role": "user",
@@ -133,8 +133,8 @@ def get_response(text, files=None):
         )
         print(completion_0.content[0].text)
 
-        completion_last = client.messages.create(
-            model="claude-3-7-sonnet-20250219",
+        completion_last = client.chat.completions.create(
+            model="anthropic/claude-sonnet-4-20250514",
             messages=[
                 {
                 "role": "user",
@@ -154,7 +154,7 @@ def get_response(text, files=None):
         print(completion_last.content[0].text)
         
         return {
-            'response': completion_last.content[0].text,
+            'response': completion_last.choices[0].message.content,
             'subject': subject
         }
     except Exception as e:
@@ -202,9 +202,9 @@ def verify_solution(user_solution, correct_solution, hints, files_data=None):
     
     """Проверяет решение пользователя через ИИ"""
     try:
-        client = Anthropic(
-            base_url=os.environ.get("ANTHROPIC_BASE_URL", "https://api.langdock.com/anthropic/eu/"),
-            api_key=os.environ.get("ANTHROPIC_API_KEY", "sk-1iCzcjVTrzPv0rFDPIiQd8TeXvTr-byoebkaigwZF0GXXbqYc3zjvL04K5H6YpIIjoYLWahO0FC1n2BPgtieKw")
+        client = OpenAI(
+            base_url="https://api.zeroeval.com/proxy",
+            api_key=os.environ.get("ZEROEVAL_API_KEY")
         )
 
         # Создаем содержимое сообщения
@@ -253,8 +253,8 @@ def verify_solution(user_solution, correct_solution, hints, files_data=None):
                         'text': f"Прикрепленный файл:\n{file.get('data', '')}"
                     })
 
-        response = client.messages.create(
-            model="claude-3-7-sonnet-20250219",
+        response = client.chat.completions.create(
+            model="anthropic/claude-sonnet-4-20250514",
             messages=[
                 {"role": "user", "content": content}
             ],
@@ -263,7 +263,7 @@ def verify_solution(user_solution, correct_solution, hints, files_data=None):
         
         try:
             # Получаем текст ответа
-            response_text = response.content[0].text
+            response_text = response.choices[0].message.content
             
             # Пытаемся извлечь JSON из ответа
             # Ищем начало и конец JSON-объекта
