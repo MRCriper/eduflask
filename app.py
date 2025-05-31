@@ -37,7 +37,7 @@ def get_response(text, files=None):
     try:
         client = OpenAI(
             base_url="https://api.zeroeval.com/proxy",
-            api_key=os.environ.get("ZEROEVAL_API_KEY")
+            api_key='sk_ze_c9YofcEqlpyRRYUS5WlFbqNTiVD_5PfOKmy-swtER60'
         )
         
         # Переменная для хранения результата обработки изображений
@@ -82,7 +82,7 @@ def get_response(text, files=None):
                 max_tokens=10240,
             )
             # Сохраняем результат обработки изображений
-            image_result = completion_image.content[0].text
+            image_result = completion_image.choices[0].message.content
         
         # Сначала определяем предмет задачи
         subject_response = client.chat.completions.create(
@@ -102,7 +102,7 @@ def get_response(text, files=None):
             max_tokens=10240,
         )
         
-        subject = subject_response.content[0].text.strip()
+        subject = subject_response.choices[0].message.content.strip()
         
         # Если ИИ вернул что-то неожиданное, используем "Другое"
         valid_subjects = ["Математика", "Физика", "Информатика", "Химия", "Биология", "ОБЖ", "ОБиЗР"]
