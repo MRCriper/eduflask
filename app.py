@@ -151,7 +151,7 @@ def get_response(text, files=None):
             ],
             max_tokens=10240,
         )
-        print(completion_last.content[0].text)
+        print(completion_last.choices[0].message.content)
         
         return {
             'response': completion_last.choices[0].message.content,
