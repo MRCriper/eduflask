@@ -48,20 +48,22 @@ def get_response(text, files=None):
             file_descriptions = []
             for file in files:
                 if file['type'] == 'image':
-                    # Для изображений создаем data URL
-                    # Проверяем, в новом ли формате файл
+                    # Для изображений создаем data URL в формате multimodal
                     if 'source' in file and file['source']['type'] == 'base64':
-                        # Файл уже в нужном формате, просто добавляем его
-                        file_descriptions.append(file)
-                    else:
-                        # Старый формат, преобразуем
+                        # Преобразуем из старого формата с source в новый формат с image_url
+                        media_type = file['source'].get('media_type', 'image/jpeg')
+                        base64_data = file['source'].get('data', '')
                         file_descriptions.append({
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": f"{file['mimeType']}",
-                                "data": f"{file['data']}"
-                            }
+                            "type": "image_url",
+                            "image_url": f"data:{media_type};base64,{base64_data}"
+                        })
+                    else:
+                        # Старый формат с прямыми полями data и mimeType
+                        mime_type = file.get('mimeType', 'image/jpeg')
+                        base64_data = file.get('data', '')
+                        file_descriptions.append({
+                            "type": "image_url",
+                            "image_url": f"data:{mime_type};base64,{base64_data}"
                         })
                 elif file['type'] == 'text':
                     # Для текстовых файлов добавляем содержимое
@@ -85,18 +87,29 @@ def get_response(text, files=None):
             image_result = completion_image.choices[0].message.content
         
         # Сначала определяем предмет задачи
+        subject_content = [
+            {
+                "type": "text",
+                "text": f"""
+                Определи предмет задачи по следующему запросу. Верни только название предмета на русском языке.
+                Возможные варианты: Математика, Физика, Информатика, Химия, Биология, Другое.
+                ВАЖНО: отвечай только на русском языке.
+                
+                Запрос: {text + image_result if files else text}
+                """
+            }
+        ]
+        
+        # Добавляем изображения к запросу, если они есть
+        if files:
+            subject_content.extend(file_descriptions)
+            
         subject_response = client.chat.completions.create(
             model="anthropic/claude-sonnet-4-20250514",
             messages=[
                 {
                     "role": "user",
-                    "content": f"""
-                    Определи предмет задачи по следующему запросу. Верни только название предмета на русском языке.
-                    Возможные варианты: Математика, Физика, Информатика, Химия, Биология, Другое.
-                    ВАЖНО: отвечай только на русском языке.
-                    
-                    Запрос: {text + image_result if files else text}
-                    """
+                    "content": subject_content
                 }
             ],
             max_tokens=10240,
@@ -109,45 +122,62 @@ def get_response(text, files=None):
         subject = subject if subject in valid_subjects else "Другое"
         logger.info(f"Определен предмет: {subject}")
 
+        completion_0_content = [
+            {
+                "type": "text",
+                "text": f"""Привет, сгенерируй задачу на русском языке по данным критериям: {text + image_result if files else text}.
+                Твой ответ должен быть python-кодом, в котором будет главная функция generate_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'.
+                Рисунок для задачи генерируй с помощью библиотеки matplotlib(Не сохраняй в файл) (Проверяй, чтоб всё работало, как надо и чтоб картинка не показывала ответ, а только помогала в решении).
+                В начале кода обязательно импортируй все необходимые библиотеки, включая matplotlib.pyplot как plt и другие нужные библиотеки.
+                HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve).
+                Все переменные должны принимать только такие названия. Также в коде не должно быть print.
+                Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно).
+                ВАЖНО: все комментарии в коде и все текстовые строки должны быть на русском языке."""
+            }
+        ]
+        
+        # Добавляем изображения к запросу, если они есть
+        if files:
+            completion_0_content.extend(file_descriptions)
+            
         completion_0 = client.chat.completions.create(
             model="anthropic/claude-sonnet-4-20250514",
             messages=[
                 {
                     "role": "user",
-                    "content": [
-                        {
-                        "type": "text",
-                        "text": f"""Привет, сгенерируй задачу на русском языке по данным критериям: {text + image_result if files else text}. 
-                        Твой ответ должен быть python-кодом, в котором будет главная функция generate_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'. 
-                        Рисунок для задачи генерируй с помощью библиотеки matplotlib(Не сохраняй в файл) (Проверяй, чтоб всё работало, как надо и чтоб картинка не показывала ответ, а только помогала в решении). 
-                        В начале кода обязательно импортируй все необходимые библиотеки, включая matplotlib.pyplot как plt и другие нужные библиотеки.
-                        HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve). 
-                        Все переменные должны принимать только такие названия. Также в коде не должно быть print. 
-                        Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно).
-                        ВАЖНО: все комментарии в коде и все текстовые строки должны быть на русском языке."""
-                        },
-                    ]
+                    "content": completion_0_content
                 }
             ],
             max_tokens=10240,
         )
         print(completion_0.choices[0].message.content)
 
-        completion_last = client.chat.completions.create(
-            model="anthropic/claude-sonnet-4-20250514",
-            messages=[
-                {
-                "role": "user",
-                "content": completion_0.choices[0].message.content + f"""В данном тексте найди python-код и оставь только его. 
-                Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие. 
-                Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve. 
-                Во-вторых в коде должна быть функция generate_problem(), в которой будет происходить генерация html-кода. 
-                В-третьих проверь синтаксис MathJax в математических формулах. 
+        completion_last_content = [
+            {
+                "type": "text",
+                "text": completion_0.choices[0].message.content + f"""В данном тексте найди python-код и оставь только его.
+                Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие.
+                Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve.
+                Во-вторых в коде должна быть функция generate_problem(), в которой будет происходить генерация html-кода.
+                В-третьих проверь синтаксис MathJax в математических формулах.
                 В-четвертых, убедись, что в начале кода импортированы все необходимые библиотеки, включая matplotlib.pyplot как plt, но не использована matplotlib.patches.
                 В-пятых, проверь, чтоб не создавалось никаких файлов.
                 Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_problem(), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче, математические формулы исправь для синтаксиса MathJax).
                 html_output должен быть в таком формате: html_output = <h3>Задача</h3>{"html-код"}<div id="hints-container" style="display:none;">{"(тут вставь символ переноса строки)".join("hints")}</div><div id="solve" style="display:none;">{"solve"}</div>
                 ВАЖНО: все комментарии в коде и все текстовые строки должны быть на русском языке."""
+            }
+        ]
+        
+        # Добавляем изображения к запросу, если они есть
+        if files:
+            completion_last_content.extend(file_descriptions)
+            
+        completion_last = client.chat.completions.create(
+            model="anthropic/claude-sonnet-4-20250514",
+            messages=[
+                {
+                    "role": "user",
+                    "content": completion_last_content
                 }
             ],
             max_tokens=10240,
@@ -234,19 +264,22 @@ def verify_solution(user_solution, correct_solution, hints, files_data=None):
         if files_data:
             for file in files_data:
                 if file['type'] == 'image':
-                    # Проверяем формат файла (новый или старый)
+                    # Преобразуем в новый формат multimodal
                     if 'source' in file:
-                        # Новый формат, просто добавляем как есть
-                        content.append(file)
-                    else:
-                        # Старый формат, преобразуем
+                        # Файл в формате с source
+                        media_type = file['source'].get('media_type', 'image/jpeg')
+                        base64_data = file['source'].get('data', '')
                         content.append({
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": file.get('mimeType', 'image/jpeg'),
-                                "data": file.get('data', '')
-                            }
+                            "type": "image_url",
+                            "image_url": f"data:{media_type};base64,{base64_data}"
+                        })
+                    else:
+                        # Старый формат с прямыми полями
+                        mime_type = file.get('mimeType', 'image/jpeg')
+                        base64_data = file.get('data', '')
+                        content.append({
+                            "type": "image_url",
+                            "image_url": f"data:{mime_type};base64,{base64_data}"
                         })
                 elif file['type'] == 'text':
                     content.append({
@@ -643,16 +676,25 @@ def student():
                         processed_files = []
                         for file_info in files_data:
                             if file_info['type'] == 'image':
-                                # Проверяем формат файла (новый или старый)
+                                # Преобразуем в новый формат multimodal
                                 if 'source' in file_info:
-                                    # Новый формат, просто добавляем как есть
+                                    # Файл в формате с source
+                                    media_type = file_info['source'].get('media_type', 'image/jpeg')
+                                    base64_data = file_info['source'].get('data', '')
+                                    processed_files.append({
+                                        'type': 'image_url',
+                                        'image_url': f"data:{media_type};base64,{base64_data}"
+                                    })
+                                elif 'image_url' in file_info:
+                                    # Уже в нужном формате
                                     processed_files.append(file_info)
                                 else:
-                                    # Старый формат, используем data и mimeType
+                                    # Старый формат с прямыми полями
+                                    mime_type = file_info.get('mimeType', 'image/jpeg')
+                                    base64_data = file_info.get('data', '')
                                     processed_files.append({
-                                        'type': 'image',
-                                        'data': file_info['data'],  # base64 строка
-                                        'mimeType': file_info['mimeType']
+                                        'type': 'image_url',
+                                        'image_url': f"data:{mime_type};base64,{base64_data}"
                                     })
                             elif file_info['type'] == 'text':
                                 processed_files.append({
@@ -723,13 +765,28 @@ def student():
                                     task_files = json.loads(task.files_data)
                                     # Проверяем и преобразуем формат файлов при необходимости
                                     for file in task_files:
-                                        if file.get('type') == 'image' and not file.get('source'):
-                                            # Преобразуем в новый формат
-                                            file['source'] = {
-                                                'type': 'base64',
-                                                'media_type': file.get('mimeType', 'image/jpeg'),
-                                                'data': file.get('data', '')
-                                            }
+                                        if file.get('type') == 'image':
+                                            # Преобразуем в новый формат multimodal
+                                            if not file.get('source') and not file.get('image_url'):
+                                                # Если это старый формат с прямыми полями
+                                                mime_type = file.get('mimeType', 'image/jpeg')
+                                                base64_data = file.get('data', '')
+                                                file['type'] = 'image_url'
+                                                file['image_url'] = f"data:{mime_type};base64,{base64_data}"
+                                                # Удаляем старые поля
+                                                if 'data' in file:
+                                                    del file['data']
+                                                if 'mimeType' in file:
+                                                    del file['mimeType']
+                                            elif file.get('source') and not file.get('image_url'):
+                                                # Если это формат с source
+                                                media_type = file['source'].get('media_type', 'image/jpeg')
+                                                base64_data = file['source'].get('data', '')
+                                                file['type'] = 'image_url'
+                                                file['image_url'] = f"data:{media_type};base64,{base64_data}"
+                                                # Удаляем старое поле source
+                                                if 'source' in file:
+                                                    del file['source']
                                 except Exception as e:
                                     logger.error(f"Ошибка при обработке файлов задачи: {str(e)}")
                                     task_files = []
