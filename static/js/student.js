@@ -305,12 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const compressedFile = await compressImage(file);
                     const base64 = await readFileAsBase64(compressedFile);
                     results.push({
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "image/jpeg",
-                            "data": base64
-                        }
+                        "type": "image_url",
+                        "image_url": `data:image/jpeg;base64,${base64}`
                     });
                 } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
                     const text = await readFileAsText(file);
@@ -322,9 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const base64 = await readFileAsBase64(file);
                     results.push({
-                        type: 'image', // Изменяем тип на image для совместимости
-                        mimeType: file.type,
-                        data: base64,
+                        type: 'image_url',
+                        image_url: `data:${file.type};base64,${base64}`,
                         name: file.name
                     });
                 }
@@ -438,23 +433,34 @@ function displayFiles(filesData) {
             const fileElement = document.createElement('div');
             fileElement.className = 'file-item';
             
-            if (file.type === 'image') {
-                // Проверяем, в новом ли формате файл
+            if (file.type === 'image_url') {
+                // Новый формат с image_url
+                fileElement.innerHTML = `
+                    <img src="${file.image_url}"
+                         alt="${file.name || 'Изображение'}"
+                         style="max-width: 300px; max-height: 200px; cursor: pointer;"
+                         onclick="window.openImagePreview('${file.image_url}')">
+                    <p>${file.name || 'Изображение'}</p>
+                `;
+            } else if (file.type === 'image') {
+                // Поддержка старого формата для обратной совместимости
                 if (file.source && file.source.type === 'base64') {
+                    const imageUrl = `data:${file.source.media_type};base64,${file.source.data}`;
                     fileElement.innerHTML = `
-                        <img src="data:${file.source.media_type};base64,${file.source.data}" 
-                             alt="Изображение" 
+                        <img src="${imageUrl}"
+                             alt="Изображение"
                              style="max-width: 300px; max-height: 200px; cursor: pointer;"
-                             onclick="window.openImagePreview('data:${file.source.media_type};base64,${file.source.data}')">
+                             onclick="window.openImagePreview('${imageUrl}')">
                         <p>Изображение</p>
                     `;
-                } else {
+                } else if (file.mimeType && file.data) {
+                    const imageUrl = `data:${file.mimeType};base64,${file.data}`;
                     fileElement.innerHTML = `
-                        <img src="data:${file.mimeType};base64,${file.data}" 
-                             alt="${file.name || 'Изображение'}" 
+                        <img src="${imageUrl}"
+                             alt="${file.name || 'Изображение'}"
                              style="max-width: 300px; max-height: 200px; cursor: pointer;"
-                             onclick="window.openImagePreview('data:${file.mimeType};base64,${file.data}')">
-                        <p>${file.name}</p>
+                             onclick="window.openImagePreview('${imageUrl}')">
+                        <p>${file.name || 'Изображение'}</p>
                     `;
                 }
             } else {
@@ -602,8 +608,8 @@ function displayFiles(filesData) {
                         <h4>Результат проверки:</h4>
                         <div>${data.html}</div>
                         ${data.is_correct ? 
-                            '<div class="correct">✓ Решение верное!</div>' : 
-                            '<div class="incorrect">✗ Есть ошибки</div>'}
+                            '<div class="correct">Решение верное!</div>' : 
+                            '<div class="incorrect">Есть ошибки</div>'}
                     </div>
                 `;
                 if (responseDiv) {
