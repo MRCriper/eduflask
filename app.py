@@ -150,7 +150,7 @@ def get_response(text, files=None):
                 "content": [
                     {
                         "type": "text",
-                        "text": completion_0.choices[0].message.content + f"""В данном тексте найди python-код и оставь только его.
+                        "text": completion_0.content[0].text + f"""В данном тексте найди python-код и оставь только его.
                         Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие.
                         Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve.
                         Во-вторых в коде должна быть функция generate_problem(), в которой будет происходить генерация html-кода.
