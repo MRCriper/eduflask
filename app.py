@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, session, redirect
 from flask import request as rq
 from flask_sqlalchemy import SQLAlchemy
-from openai import OpenAI
+from anthropic import Anthropic
 from datetime import datetime
 import os
 from sqlalchemy.orm import Session
@@ -18,225 +18,208 @@ import numpy as np
 import io
 import base64
 
-
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('app.log')
-    ]
-)
+    handlers=[logging.StreamHandler(),
+              logging.FileHandler('app.log')])
 logger = logging.getLogger(__name__)
 
 # Загрузка переменных окружения
 load_dotenv()
 
+
 def get_response(text, files=None):
     try:
-        client = OpenAI(
-            base_url="https://api.zeroeval.com/proxy",
-            api_key='sk_ze_c9YofcEqlpyRRYUS5WlFbqNTiVD_5PfOKmy-swtER60'
-        )
-        
+        client = Anthropic(
+            base_url=os.environ.get("ANTHROPIC_BASE_URL",
+                                    "https://api.langdock.com/anthropic/eu/"),
+            api_key=os.environ.get(
+                "ANTHROPIC_API_KEY",
+                "sk-dGzVjQst46s8ODLhiCO9Z_9wuahdmoHK4KkqYKXWf9BxoLvVF49jjhln-_nx0UU3KZ9L7rxN2dfB36xCPqaYBg"
+            ))
+
         # Переменная для хранения результата обработки изображений
         image_result = ""
-        
+
         if files:
             # Создаем список описаний файлов для LLM
             file_descriptions = []
             for file in files:
                 if file['type'] == 'image':
-                    # Для изображений создаем data URL в формате multimodal
+                    # Для изображений создаем data URL
+                    # Проверяем, в новом ли формате файл
                     if 'source' in file and file['source']['type'] == 'base64':
-                        # Преобразуем из старого формата с source в новый формат с image_url
-                        media_type = file['source'].get('media_type', 'image/jpeg')
-                        base64_data = file['source'].get('data', '')
-                        file_descriptions.append({
-                            "type": "image_url",
-                            "image_url": f"data:{media_type};base64,{base64_data}"
-                        })
+                        # Файл уже в нужном формате, просто добавляем его
+                        file_descriptions.append(file)
                     else:
-                        # Старый формат с прямыми полями data и mimeType
-                        mime_type = file.get('mimeType', 'image/jpeg')
-                        base64_data = file.get('data', '')
+                        # Старый формат, преобразуем
                         file_descriptions.append({
-                            "type": "image_url",
-                            "image_url": f"data:{mime_type};base64,{base64_data}"
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": f"{file['mimeType']}",
+                                "data": f"{file['data']}"
+                            }
                         })
                 elif file['type'] == 'text':
                     # Для текстовых файлов добавляем содержимое
                     file_descriptions.append({
-                        'type': 'text',
-                        'text': f"Содержимое файла:\n{file['data']}"
+                        'type':
+                        'text',
+                        'text':
+                        f"Содержимое файла:\n{file['data']}"
                     })
-        
+
             # Обрабатываем файлы и сохраняем результат
-            completion_image = client.chat.completions.create(
-                model="anthropic/claude-sonnet-4-20250514",
-                messages=[
-                    {"role": "user", "content": [
-                                {"type": "text", "text": 'Представь, что ты учитель и тебе нужно максимально понятно объяснить что-то своим ученикам. Описывай подробно, как ты приходишь к тому или иному действию. ВАЖНО: отвечай только на русском языке.' + f"Запрос пользователя: {text}"},
-                                *file_descriptions
-                            ]}
-                ],
+            completion_image = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                messages=[{
+                    "role":
+                    "user",
+                    "content": [{
+                        "type":
+                        "text",
+                        "text":
+                        'Представь, что ты учитель и тебе нужно максимально понятно объяснить что-то своим ученикам. Описывай подробно, как ты приходишь к тому или иному действию. ВАЖНО: отвечай только на русском языке.'
+                        + f"Запрос пользователя: {text}"
+                    }, *file_descriptions]
+                }],
                 max_tokens=10240,
             )
             # Сохраняем результат обработки изображений
-            image_result = completion_image.choices[0].message.content
-        
+            image_result = completion_image.content[0].text
+
         # Сначала определяем предмет задачи
-        subject_content = [
-            {
-                "type": "text",
-                "text": f"""
-                Определи предмет задачи по следующему запросу. Верни только название предмета на русском языке.
-                Возможные варианты: Математика, Физика, Информатика, Химия, Биология, Другое.
-                ВАЖНО: отвечай только на русском языке.
-                
-                Запрос: {text + image_result if files else text}
-                """
-            }
-        ]
-        
-        # Добавляем изображения к запросу, если они есть
-        if files:
-            subject_content.extend(file_descriptions)
-            
-        subject_response = client.chat.completions.create(
-            model="anthropic/claude-sonnet-4-20250514",
-            messages=[
-                {
-                    "role": "user",
-                    "content": subject_content
-                }
-            ],
+        subject_response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            messages=[{
+                "role":
+                "user",
+                "content":
+                f"""
+                    Определи предмет задачи по следующему запросу. Верни только название предмета на русском языке.
+                    Возможные варианты: Математика, Физика, Информатика, Химия, Биология, Другое.
+                    ВАЖНО: отвечай только на русском языке.
+
+                    Запрос: {text + image_result if files else text}
+                    """
+            }],
             max_tokens=10240,
         )
-        
-        subject = subject_response.choices[0].message.content.strip()
-        
+
+        subject = subject_response.content[0].text.strip()
+
         # Если ИИ вернул что-то неожиданное, используем "Другое"
-        valid_subjects = ["Математика", "Физика", "Информатика", "Химия", "Биология", "ОБЖ", "ОБиЗР"]
+        valid_subjects = [
+            "Математика", "Физика", "Информатика", "Химия", "Биология", "ОБЖ",
+            "ОБиЗР"
+        ]
         subject = subject if subject in valid_subjects else "Другое"
         logger.info(f"Определен предмет: {subject}")
 
-        completion_0_content = [
-            {
-                "type": "text",
-                "text": f"""Привет, сгенерируй задачу на русском языке по данным критериям: {text + image_result if files else text}.
-                Твой ответ должен быть python-кодом, в котором будет главная функция generate_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'.
-                Рисунок для задачи генерируй с помощью библиотеки matplotlib(Не сохраняй в файл) (Проверяй, чтоб всё работало, как надо и чтоб картинка не показывала ответ, а только помогала в решении).
-                В начале кода обязательно импортируй все необходимые библиотеки, включая matplotlib.pyplot как plt и другие нужные библиотеки.
-                HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve).
-                Все переменные должны принимать только такие названия. Также в коде не должно быть print.
-                Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно).
-                ВАЖНО: все комментарии в коде и все текстовые строки должны быть на русском языке."""
-            }
-        ]
-        
-        # Добавляем изображения к запросу, если они есть
-        if files:
-            completion_0_content.extend(file_descriptions)
-            
-        completion_0 = client.chat.completions.create(
-            model="anthropic/claude-sonnet-4-20250514",
-            messages=[
-                {
-                    "role": "user",
-                    "content": completion_0_content
-                }
-            ],
+        completion_0 = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            messages=[{
+                "role":
+                "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"""Привет, сгенерируй задачу на русском языке по данным критериям: {text + image_result if files else text}.
+                        Твой ответ должен быть python-кодом, в котором будет главная функция generate_problem(), в ней будет генерироваться html-код с самой задачей в таком формате: 'Заголовок задачи (тег <h3>).  Текстовое условие задачи (тег <p>).  Рисунок или схема (если требуется) (тег <img>) (ширину рисунка ставь 600)'.
+                        Рисунок для задачи генерируй с помощью библиотеки matplotlib(Не сохраняй в файл) (Проверяй, чтоб всё работало, как надо и чтоб картинка не показывала ответ, а только помогала в решении).
+                        В начале кода обязательно импортируй все необходимые библиотеки, включая matplotlib.pyplot как plt и другие нужные библиотеки.
+                        HTML-код сохраняй в переменную html_output, также обязательно добавь подсказки к задаче(список с названием hints) и ответ в виде строки(переменная solve).
+                        Все переменные должны принимать только такие названия. Также в коде не должно быть print.
+                        Все математические формулы адаптируй под синтаксис MathJax(Проверяй, чтоб всё было правильно).
+                        ВАЖНО: все комментарии в коде и все текстовые строки должны быть на русском языке."""
+                    },
+                ]
+            }],
             max_tokens=10240,
         )
-        print(completion_0.choices[0].message.content)
+        print(completion_0.content[0].text)
 
-        completion_last_content = [
-            {
-                "type": "text",
-                "text": completion_0.choices[0].message.content + f"""В данном тексте найди python-код и оставь только его.
-                Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие.
-                Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve.
-                Во-вторых в коде должна быть функция generate_problem(), в которой будет происходить генерация html-кода.
-                В-третьих проверь синтаксис MathJax в математических формулах.
-                В-четвертых, убедись, что в начале кода импортированы все необходимые библиотеки, включая matplotlib.pyplot как plt, но не использована matplotlib.patches.
-                В-пятых, проверь, чтоб не создавалось никаких файлов.
-                Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_problem(), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче, математические формулы исправь для синтаксиса MathJax).
-                html_output должен быть в таком формате: html_output = <h3>Задача</h3>{"html-код"}<div id="hints-container" style="display:none;">{"(тут вставь символ переноса строки)".join("hints")}</div><div id="solve" style="display:none;">{"solve"}</div>
-                ВАЖНО: все комментарии в коде и все текстовые строки должны быть на русском языке."""
-            }
-        ]
-        
-        # Добавляем изображения к запросу, если они есть
-        if files:
-            completion_last_content.extend(file_descriptions)
-            
-        completion_last = client.chat.completions.create(
-            model="anthropic/claude-sonnet-4-20250514",
-            messages=[
-                {
-                    "role": "user",
-                    "content": completion_last_content
-                }
-            ],
+        completion_last = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            messages=[{
+                "role":
+                "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": completion_0.choices[0].message.content + f"""В данном тексте найди python-код и оставь только его.
+                        Также тебе нужно проверить и, если необходимо, исправить некоторые составляющие.
+                        Во-первых в коде не должно быть print, но должны быть переменные html_output, hints и solve.
+                        Во-вторых в коде должна быть функция generate_problem(), в которой будет происходить генерация html-кода.
+                        В-третьих проверь синтаксис MathJax в математических формулах.
+                        В-четвертых, убедись, что в начале кода импортированы все необходимые библиотеки, включая matplotlib.pyplot как plt, но не использована matplotlib.patches.
+                        В-пятых, проверь, чтоб не создавалось никаких файлов.
+                        Если что-то из этого не так, исправь(то есть, убери print, добавь функцию generate_problem(), добавь переменные html_output с html-кодом, hints - с подсказками к задаче, solve - с ответом к задаче, математические формулы исправь для синтаксиса MathJax).
+                        html_output должен быть в таком формате: html_output = <h3>Задача</h3>{"html-код"}<div id="hints-container" style="display:none;">{"(тут вставь символ переноса строки)".join("hints")}</div><div id="solve" style="display:none;">{"solve"}</div>
+                        ВАЖНО: все комментарии в коде и все текстовые строки должны быть на русском языке."""
+                    },
+                ]
+            }],
             max_tokens=10240,
         )
-        print(completion_last.choices[0].message.content)
-        
+        print(completion_last.content[0].text)
+
         return {
-            'response': completion_last.choices[0].message.content,
+            'response': completion_last.content[0].text,
             'subject': subject
         }
     except Exception as e:
         logger.error(f"Ошибка в функции get_response: {str(e)}")
         return {
-            'response': '<h3>Произошла ошибка при генерации задачи. Попробуйте другой запрос.</h3>',
+            'response':
+            '<h3>Произошла ошибка при генерации задачи. Попробуйте другой запрос.</h3>',
             'subject': 'Другое'
         }
 
 
 def verify_solution(user_solution, correct_solution, hints, files_data=None):
     print(correct_solution)
+
     def update_user_stats(user_id, is_correct):
         try:
             subject = session.get('current_subject', 'Другое')
             # Используем scalar_one_or_none() для получения одного результата или None
             stats = db.session.execute(
                 db.select(UserStats).where(
-                    UserStats.user_id == user_id, 
-                    UserStats.subject == subject
-                )
-            ).scalar_one_or_none()
-            
+                    UserStats.user_id == user_id,
+                    UserStats.subject == subject)).scalar_one_or_none()
+
             if not stats:
                 # Если статистики нет - создаем новую запись
-                stats = UserStats(
-                    user_id=user_id, 
-                    subject=subject,
-                    correct_answers=0,
-                    wrong_answers=0
-                )
+                stats = UserStats(user_id=user_id,
+                                  subject=subject,
+                                  correct_answers=0,
+                                  wrong_answers=0)
                 db.session.add(stats)
-            
+
             # Теперь точно есть объект stats, можно обновлять
             if is_correct:
                 stats.correct_answers = (stats.correct_answers or 0) + 1
             else:
                 stats.wrong_answers = (stats.wrong_answers or 0) + 1
-            
+
             db.session.commit()
         except Exception as e:
             logger.error(f"Ошибка при обновлении статистики: {str(e)}")
             db.session.rollback()
 
-    
     """Проверяет решение пользователя через ИИ"""
     try:
-        client = OpenAI(
-            base_url="https://api.zeroeval.com/proxy",
-            api_key=os.environ.get("ZEROEVAL_API_KEY")
-        )
+        client = Anthropic(
+            base_url=os.environ.get("ANTHROPIC_BASE_URL",
+                                    "https://api.langdock.com/anthropic/eu/"),
+            api_key=os.environ.get(
+                "ANTHROPIC_API_KEY",
+                "sk-1iCzcjVTrzPv0rFDPIiQd8TeXvTr-byoebkaigwZF0GXXbqYc3zjvL04K5H6YpIIjoYLWahO0FC1n2BPgtieKw"
+            ))
 
         # Создаем содержимое сообщения
         content = [
@@ -264,68 +247,71 @@ def verify_solution(user_solution, correct_solution, hints, files_data=None):
         if files_data:
             for file in files_data:
                 if file['type'] == 'image':
-                    # Преобразуем в новый формат multimodal
+                    # Проверяем формат файла (новый или старый)
                     if 'source' in file:
-                        # Файл в формате с source
-                        media_type = file['source'].get('media_type', 'image/jpeg')
-                        base64_data = file['source'].get('data', '')
-                        content.append({
-                            "type": "image_url",
-                            "image_url": f"data:{media_type};base64,{base64_data}"
-                        })
+                        # Новый формат, просто добавляем как есть
+                        content.append(file)
                     else:
-                        # Старый формат с прямыми полями
-                        mime_type = file.get('mimeType', 'image/jpeg')
-                        base64_data = file.get('data', '')
+                        # Старый формат, преобразуем
                         content.append({
-                            "type": "image_url",
-                            "image_url": f"data:{mime_type};base64,{base64_data}"
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": file.get('mimeType',
+                                                       'image/jpeg'),
+                                "data": file.get('data', '')
+                            }
                         })
                 elif file['type'] == 'text':
                     content.append({
-                        'type': 'text',
-                        'text': f"Прикрепленный файл:\n{file.get('data', '')}"
+                        'type':
+                        'text',
+                        'text':
+                        f"Прикрепленный файл:\n{file.get('data', '')}"
                     })
 
-        response = client.chat.completions.create(
-            model="anthropic/claude-sonnet-4-20250514",
-            messages=[
-                {"role": "user", "content": content}
-            ],
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            messages=[{
+                "role": "user",
+                "content": content
+            }],
             max_tokens=10240,
         )
-        
+
         try:
             # Получаем текст ответа
-            response_text = response.choices[0].message.content
-            
+            response_text = response.content[0].text
+
             # Пытаемся извлечь JSON из ответа
             # Ищем начало и конец JSON-объекта
             json_start = response_text.find('{')
             json_end = response_text.rfind('}') + 1
-            
+
             if json_start >= 0 and json_end > json_start:
                 json_str = response_text[json_start:json_end]
                 result = json.loads(json_str)
-                
+
                 if 'analysis' in result and 'is_correct' in result:
                     if 'user_id' in session:
-                        update_user_stats(session['user_id'], result["is_correct"])
+                        update_user_stats(session['user_id'],
+                                          result["is_correct"])
                     return result["analysis"], result["is_correct"]
-            
+
             # Если не удалось извлечь JSON или в нем нет нужных полей
             logger.error(f"Неверный формат ответа от API: {response_text}")
             return "Не удалось проверить решение. Неверный формат ответа.", False
-            
+
         except Exception as e:
             logger.error(f"Ошибка при обработке результата проверки: {str(e)}")
             return "Не удалось проверить решение", False
     except Exception as e:
         logger.error(f"Ошибка при проверке решения: {str(e)}")
         return "Произошла ошибка при проверке решения", False
-    
+
 
 def login_required(f):
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
@@ -333,6 +319,7 @@ def login_required(f):
                 return jsonify({'error': 'Unauthorized'}), 401
             return redirect('/')
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -353,63 +340,77 @@ def get_code(response):
                 # Если не нашли ни одного маркера, возвращаем ошибку
                 logger.warning("Не найдены маркеры блока кода в ответе AI")
                 return '<h3>Не удалось сгенерировать задачу. Ответ не содержит код.</h3>', [], ''
-        
+
         # Находим конец блока кода
         end_index = response.find('```', start_index)
         if end_index == -1:
             # Если не нашли закрывающий маркер, берем весь оставшийся текст
-            logger.warning("Не найден закрывающий маркер блока кода, используем весь оставшийся текст")
+            logger.warning(
+                "Не найден закрывающий маркер блока кода, используем весь оставшийся текст"
+            )
             end_index = len(response)
-            
+
         # Извлекаем код
         code = response[start_index:end_index].strip()
         if not code:
             logger.warning("Извлеченный код пуст")
             return '<h3>Не удалось сгенерировать задачу. Извлеченный код пуст.</h3>', [], ''
-        
+
         logger.info(f"Извлечен код длиной {len(code)} символов")
-        
+
         # Создаем локальное пространство имен для выполнения кода
         local_namespace = {}
-        
+
         try:
             # Выполняем код в памяти
             exec(code, globals(), local_namespace)
         except Exception as exec_error:
-            logger.error(f"Ошибка при выполнении кода: {str(exec_error)}\n{traceback.format_exc()}")
+            logger.error(
+                f"Ошибка при выполнении кода: {str(exec_error)}\n{traceback.format_exc()}"
+            )
             return f'<h3>Ошибка при выполнении кода: {str(exec_error)}</h3>', [], ''
-        
+
         # Проверяем, есть ли необходимые функции и переменные
         if 'generate_problem' not in local_namespace:
             # Попробуем найти альтернативные имена функции
-            possible_names = [name for name in local_namespace if 'generate' in name.lower() and 'problem' in name.lower()]
+            possible_names = [
+                name for name in local_namespace
+                if 'generate' in name.lower() and 'problem' in name.lower()
+            ]
             if possible_names:
-                logger.info(f"Найдена альтернативная функция: {possible_names[0]}")
+                logger.info(
+                    f"Найдена альтернативная функция: {possible_names[0]}")
                 generated_function = local_namespace[possible_names[0]]
             else:
-                logger.warning("Не найдена функция generate_problem или ее альтернативы")
+                logger.warning(
+                    "Не найдена функция generate_problem или ее альтернативы")
                 return '<h3>Не удалось найти функцию генерации задачи в коде.</h3>', [], ''
         else:
             generated_function = local_namespace['generate_problem']
-        
+
         try:
             # Вызываем функцию из локального пространства имен
             result = generated_function()
         except Exception as func_error:
-            logger.error(f"Ошибка при вызове функции генерации: {str(func_error)}\n{traceback.format_exc()}")
+            logger.error(
+                f"Ошибка при вызове функции генерации: {str(func_error)}\n{traceback.format_exc()}"
+            )
             return f'<h3>Ошибка при генерации задачи: {str(func_error)}</h3>', [], ''
-        
+
         # Проверяем форматы результатов
         if isinstance(result, tuple) and len(result) == 3:
             html_output, hints, solve = result
             logger.info("Функция вернула кортеж из трех элементов")
         else:
-            logger.info("Функция не вернула кортеж из трех элементов, ищем переменные в пространстве имен")
+            logger.info(
+                "Функция не вернула кортеж из трех элементов, ищем переменные в пространстве имен"
+            )
             # Если функция не возвращает кортеж из трех элементов, проверяем переменные в локальном namespace
-            html_output = local_namespace.get('html_output', '<h3>Задача не сгенерирована</h3>')
+            html_output = local_namespace.get(
+                'html_output', '<h3>Задача не сгенерирована</h3>')
             hints = local_namespace.get('hints', [])
             solve = local_namespace.get('solve', '')
-            
+
             # Проверяем, что все необходимые переменные найдены
             if not html_output or html_output == '<h3>Задача не сгенерирована</h3>':
                 logger.warning("Переменная html_output не найдена или пуста")
@@ -417,30 +418,35 @@ def get_code(response):
                 logger.warning("Переменная hints не найдена или пуста")
             if not solve:
                 logger.warning("Переменная solve не найдена или пуста")
-        
+
         # Проверяем, что hints - это список
         if not isinstance(hints, list):
-            logger.warning(f"hints не является списком, преобразуем: {type(hints)}")
+            logger.warning(
+                f"hints не является списком, преобразуем: {type(hints)}")
             # Если hints не список, пытаемся преобразовать его в список
             if isinstance(hints, str):
                 hints = [hints]
             else:
                 hints = [str(hints)]
-        
+
         return html_output, hints, solve
     except Exception as e:
-        logger.error(f"Критическая ошибка при обработке кода: {str(e)}\n{traceback.format_exc()}")
+        logger.error(
+            f"Критическая ошибка при обработке кода: {str(e)}\n{traceback.format_exc()}"
+        )
         return f'<h3>Не удалось сгенерировать задачу. Ошибка: {str(e)}</h3>', [], ''
 
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'Axxvvjw')
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', "sqlite:///eduflask.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    'DATABASE_URL', "sqlite:///eduflask.db")
 
 # Отключаем отслеживание модификаций для улучшения производительности
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -449,25 +455,31 @@ class User(db.Model):
     stats = db.relationship('UserStats', backref='user', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 class UserStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     subject = db.Column(db.String(50), nullable=False)
     correct_answers = db.Column(db.Integer, default=0)
     wrong_answers = db.Column(db.Integer, default=0)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime,
+                           default=datetime.utcnow,
+                           onupdate=datetime.utcnow)
+
 
 class Task(db.Model):
     id = db.Column(db.String(32), primary_key=True)  # Случайный ID
     html_output = db.Column(db.Text)  # HTML задачи
-    hints = db.Column(db.Text)        # Подсказки (храним как JSON или текст)
+    hints = db.Column(db.Text)  # Подсказки (храним как JSON или текст)
     solve = db.Column(db.String(255))
-    files_data = db.Column(db.Text) # Ответ
+    files_data = db.Column(db.Text)  # Ответ
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 # Создаем таблицу (если её нет)
 with app.app_context():
-    db.create_all() 
+    db.create_all()
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -477,10 +489,16 @@ def register():
         password = data.get('password')
 
         if not username or not password:
-            return jsonify({'success': False, 'message': 'Имя пользователя и пароль обязательны'})
+            return jsonify({
+                'success': False,
+                'message': 'Имя пользователя и пароль обязательны'
+            })
 
         if User.query.filter_by(username=username).first():
-            return jsonify({'success': False, 'message': 'Пользователь уже существует'})
+            return jsonify({
+                'success': False,
+                'message': 'Пользователь уже существует'
+            })
 
         hashed_password = generate_password_hash(password)
         new_user = User(username=username, password=hashed_password)
@@ -495,7 +513,11 @@ def register():
     except Exception as e:
         logger.error(f"Ошибка при регистрации: {str(e)}")
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'Ошибка при регистрации: {str(e)}'})
+        return jsonify({
+            'success': False,
+            'message': f'Ошибка при регистрации: {str(e)}'
+        })
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -507,7 +529,10 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if not user or not check_password_hash(user.password, password):
-            return jsonify({'success': False, 'message': 'Неверное имя пользователя или пароль'})
+            return jsonify({
+                'success': False,
+                'message': 'Неверное имя пользователя или пароль'
+            })
 
         session['user_id'] = user.id
         return jsonify({
@@ -518,7 +543,11 @@ def login():
         })
     except Exception as e:
         logger.error(f"Ошибка при входе: {str(e)}")
-        return jsonify({'success': False, 'message': f'Ошибка при входе: {str(e)}'})
+        return jsonify({
+            'success': False,
+            'message': f'Ошибка при входе: {str(e)}'
+        })
+
 
 @app.route('/clear_task', methods=['POST'])
 @login_required
@@ -534,11 +563,13 @@ def clear_task():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
 
+
 @app.route("/")
 def index():
     if 'user_id' in session:
         return redirect('/student')
     return render_template("index.html")
+
 
 @app.route('/check_auth')
 def check_auth():
@@ -555,21 +586,22 @@ def check_auth():
         logger.error(f"Ошибка при проверке аутентификации: {str(e)}")
         return jsonify({'authenticated': False, 'error': str(e)})
 
+
 @app.route('/check_active_task')
 def check_active_task():
     try:
         has_active_task = 'task_id' in session
-        return jsonify({
-            'has_active_task': has_active_task
-        })
+        return jsonify({'has_active_task': has_active_task})
     except Exception as e:
         logger.error(f"Ошибка при проверке активной задачи: {str(e)}")
         return jsonify({'has_active_task': False, 'error': str(e)})
+
 
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
     return jsonify({'success': True})
+
 
 @app.route('/account')
 @login_required
@@ -579,19 +611,18 @@ def account():
         user = db_session.get(User, session['user_id'])
         if not user:
             return redirect('/logout')
-            
+
         stats = db_session.execute(
-            db.select(UserStats).where(UserStats.user_id == user.id)
-        ).scalars().all()
-        
-        return render_template('account.html', 
-                            current_user=user, 
-                            stats=stats)
+            db.select(UserStats).where(
+                UserStats.user_id == user.id)).scalars().all()
+
+        return render_template('account.html', current_user=user, stats=stats)
     except Exception as e:
         logger.error(f"Ошибка при доступе к аккаунту: {str(e)}")
         return redirect('/')
     finally:
         db_session.close()
+
 
 @app.route('/change_password', methods=['POST'])
 @login_required
@@ -615,7 +646,8 @@ def change_password():
             }), 404
 
         # Проверка текущего пароля
-        if not check_password_hash(user.password, data.get('current_password', '')):
+        if not check_password_hash(user.password,
+                                   data.get('current_password', '')):
             return jsonify({
                 'success': False,
                 'message': 'Неверный текущий пароль',
@@ -644,7 +676,7 @@ def change_password():
         # Обновление пароля
         user.password = generate_password_hash(data['new_password'])
         db_session.commit()
-        
+
         return jsonify({'success': True, 'message': 'Пароль успешно изменён'})
     except Exception as e:
         logger.error(f"Ошибка при изменении пароля: {str(e)}")
@@ -664,7 +696,7 @@ def student():
             max_attempts = 3  # Максимальное количество попыток (уменьшено для производительности)
             success = False
             db_session = Session(db.engine)
-            
+
             try:
                 for _ in range(max_attempts):
                     try:
@@ -676,88 +708,97 @@ def student():
                         processed_files = []
                         for file_info in files_data:
                             if file_info['type'] == 'image':
-                                # Преобразуем в новый формат multimodal
+                                # Проверяем формат файла (новый или старый)
                                 if 'source' in file_info:
-                                    # Файл в формате с source
-                                    media_type = file_info['source'].get('media_type', 'image/jpeg')
-                                    base64_data = file_info['source'].get('data', '')
-                                    processed_files.append({
-                                        'type': 'image_url',
-                                        'image_url': f"data:{media_type};base64,{base64_data}"
-                                    })
-                                elif 'image_url' in file_info:
-                                    # Уже в нужном формате
+                                    # Новый формат, просто добавляем как есть
                                     processed_files.append(file_info)
                                 else:
-                                    # Старый формат с прямыми полями
-                                    mime_type = file_info.get('mimeType', 'image/jpeg')
-                                    base64_data = file_info.get('data', '')
+                                    # Старый формат, используем data и mimeType
                                     processed_files.append({
-                                        'type': 'image_url',
-                                        'image_url': f"data:{mime_type};base64,{base64_data}"
+                                        'type':
+                                        'image',
+                                        'data':
+                                        file_info['data'],  # base64 строка
+                                        'mimeType':
+                                        file_info['mimeType']
                                     })
                             elif file_info['type'] == 'text':
                                 processed_files.append({
-                                    'type': 'text',
-                                    'data': file_info['data']
+                                    'type':
+                                    'text',
+                                    'data':
+                                    file_info['data']
                                 })
                             else:
                                 # Для других типов файлов
                                 if 'data' in file_info:
                                     processed_files.append({
-                                        'type': 'binary',
-                                        'data': file_info['data'],
-                                        'mimeType': file_info.get('mimeType', 'application/octet-stream')
+                                        'type':
+                                        'binary',
+                                        'data':
+                                        file_info['data'],
+                                        'mimeType':
+                                        file_info.get(
+                                            'mimeType',
+                                            'application/octet-stream')
                                     })
                                 else:
                                     # Если нет ключа data, добавляем как есть
                                     processed_files.append(file_info)
 
                         if 'task_id' not in session:  # Первый запрос - генерация задачи
-                            result = get_response(request_text, processed_files)
+                            result = get_response(request_text,
+                                                  processed_files)
 
-                            html_output, hints, solve = get_code(result['response'])
+                            html_output, hints, solve = get_code(
+                                result['response'])
 
                             # Проверяем наличие обязательных полей
                             if html_output and solve and hints:
                                 # Сохраняем задачу в БД
-                                task_id = str(uuid.uuid4()).replace('-', '')[:32]
+                                task_id = str(uuid.uuid4()).replace('-',
+                                                                    '')[:32]
                                 new_task = Task(
                                     id=task_id,
                                     html_output=html_output,
                                     hints="\n".join(hints),
                                     solve=solve,
-                                    files_data=json.dumps(files_data) if files_data else None  # Сохраняем предмет задачи
+                                    files_data=json.dumps(files_data)
+                                    if files_data else
+                                    None  # Сохраняем предмет задачи
                                 )
                                 db.session.add(new_task)
                                 db.session.commit()
                                 session['task_id'] = task_id
-                                session['current_subject'] = result['subject']  # Сохраняем предмет в сессии
+                                session['current_subject'] = result[
+                                    'subject']  # Сохраняем предмет в сессии
                                 success = True
 
                                 return jsonify({
-                                        "type": "task",
-                                        "html": html_output,
-                                        "hints": hints,
-                                        "solve": "",
-                                        "files": files_data  # Ответ не показываем
-                                        })
+                                    "type": "task",
+                                    "html": html_output,
+                                    "hints": hints,
+                                    "solve": "",
+                                    "files": files_data  # Ответ не показываем
+                                })
                             else:
                                 continue
-                        
+
                         # Сохраняем данные задачи в сессии
-                            
-                        
+
                         else:  # Последующие запросы - проверка решения
                             task_id = session['task_id']
-                            task = db_session.get(Task, task_id) # Ищем задачу по ID
+                            task = db_session.get(Task,
+                                                  task_id)  # Ищем задачу по ID
 
                             if not task:
                                 return jsonify({
-                                    "type": "error",
-                                    "html": "<h3>Ошибка: задача не найдена в базе.</h3>"
+                                    "type":
+                                    "error",
+                                    "html":
+                                    "<h3>Ошибка: задача не найдена в базе.</h3>"
                                 })
-                            
+
                             # Получаем файлы задачи
                             task_files = []
                             if task.files_data:
@@ -765,36 +806,30 @@ def student():
                                     task_files = json.loads(task.files_data)
                                     # Проверяем и преобразуем формат файлов при необходимости
                                     for file in task_files:
-                                        if file.get('type') == 'image':
-                                            # Преобразуем в новый формат multimodal
-                                            if not file.get('source') and not file.get('image_url'):
-                                                # Если это старый формат с прямыми полями
-                                                mime_type = file.get('mimeType', 'image/jpeg')
-                                                base64_data = file.get('data', '')
-                                                file['type'] = 'image_url'
-                                                file['image_url'] = f"data:{mime_type};base64,{base64_data}"
-                                                # Удаляем старые поля
-                                                if 'data' in file:
-                                                    del file['data']
-                                                if 'mimeType' in file:
-                                                    del file['mimeType']
-                                            elif file.get('source') and not file.get('image_url'):
-                                                # Если это формат с source
-                                                media_type = file['source'].get('media_type', 'image/jpeg')
-                                                base64_data = file['source'].get('data', '')
-                                                file['type'] = 'image_url'
-                                                file['image_url'] = f"data:{media_type};base64,{base64_data}"
-                                                # Удаляем старое поле source
-                                                if 'source' in file:
-                                                    del file['source']
+                                        if file.get(
+                                                'type'
+                                        ) == 'image' and not file.get(
+                                                'source'):
+                                            # Преобразуем в новый формат
+                                            file['source'] = {
+                                                'type':
+                                                'base64',
+                                                'media_type':
+                                                file.get(
+                                                    'mimeType', 'image/jpeg'),
+                                                'data':
+                                                file.get('data', '')
+                                            }
                                 except Exception as e:
-                                    logger.error(f"Ошибка при обработке файлов задачи: {str(e)}")
+                                    logger.error(
+                                        f"Ошибка при обработке файлов задачи: {str(e)}"
+                                    )
                                     task_files = []
-                            
+
                             # Добавляем файлы из текущего запроса, если они есть
                             if files_data:
                                 task_files.extend(processed_files)
-                            
+
                             # Проверяем решение через ИИ
                             analysis, is_correct = verify_solution(
                                 request_text.strip(),
@@ -806,31 +841,39 @@ def student():
                             return jsonify({
                                 "type": "verification",
                                 "html": analysis,
-                                "is_correct": is_correct,  # Теперь реальный анализ от ИИ
+                                "is_correct":
+                                is_correct,  # Теперь реальный анализ от ИИ
                                 "hints": task.hints.split("\n"),
                                 "task_html": task.html_output,
-                                "task_files": task_files  # Добавляем HTML задачи для повторного отображения
+                                "task_files":
+                                task_files  # Добавляем HTML задачи для повторного отображения
                             })
 
                     except Exception as e:
-                        logger.error(f"Ошибка в попытке {_+1}/{max_attempts}: {str(e)}\n{traceback.format_exc()}")
+                        logger.error(
+                            f"Ошибка в попытке {_+1}/{max_attempts}: {str(e)}\n{traceback.format_exc()}"
+                        )
                         if _ == max_attempts - 1:  # Если это последняя попытка
                             raise  # Пробрасываем исключение дальше
-                
+
                 # Если мы дошли сюда и success все еще False, значит все попытки не удались
                 if not success:
                     return jsonify({
                         "type": "error",
-                        "html": '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>',
+                        "html":
+                        '<h3>Не удалось сгенерировать задачу. Попробуйте другой запрос.</h3>',
                         "hints": [],
                         "solve": ""
                     })
             except Exception as e:
                 db_session.rollback()
-                logger.error(f"Критическая ошибка в маршруте /student: {str(e)}\n{traceback.format_exc()}")
+                logger.error(
+                    f"Критическая ошибка в маршруте /student: {str(e)}\n{traceback.format_exc()}"
+                )
                 return jsonify({
                     "type": "error",
-                    "html": f'<h3>Произошла ошибка при обработке запроса: {str(e)}</h3>',
+                    "html":
+                    f'<h3>Произошла ошибка при обработке запроса: {str(e)}</h3>',
                     "hints": [],
                     "solve": ""
                 })
@@ -847,6 +890,7 @@ def student():
 def page_not_found(e):
     return render_template('404.html'), 404
 
+
 @app.errorhandler(500)
 def internal_server_error(e):
     logger.error(f"Внутренняя ошибка сервера: {str(e)}")
@@ -855,7 +899,9 @@ def internal_server_error(e):
 
 if __name__ == "__main__":
     # Для локальной разработки используем встроенный сервер
-    app.run(debug=os.environ.get('FLASK_ENV') != 'production', host='127.0.0.1', port=5000)
+    app.run(debug=os.environ.get('FLASK_ENV') != 'production',
+            host='127.0.0.1',
+            port=5000)
 else:
     # В продакшене используем Gunicorn или другой WSGI-сервер
     # Настройка gunicorn: gunicorn --workers=3 --bind=0.0.0.0:5000 wsgi:app
