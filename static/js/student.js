@@ -131,6 +131,56 @@ function isMobileDevice() {
            (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 }
 
+// Функция для обработки изображений в задачах для мобильных устройств
+function processTaskImages() {
+    // Проверяем, является ли устройство мобильным
+    if (!isMobileDevice()) return;
+    
+    // Находим все изображения в контейнере задачи
+    const responseDiv = document.querySelector('.response');
+    if (!responseDiv) return;
+    
+    const images = responseDiv.querySelectorAll('img:not(.hint-img):not(.table-icon):not(.svg-icon)');
+    
+    images.forEach(img => {
+        // Пропускаем изображения, которые уже обработаны
+        if (img.closest('.image-container')) return;
+        
+        // Получаем src изображения
+        const imgSrc = img.src;
+        
+        // Создаем контейнер для изображения
+        const container = document.createElement('div');
+        container.className = 'task-image-container';
+        
+        // Клонируем стили изображения
+        const computedStyle = window.getComputedStyle(img);
+        const width = computedStyle.width;
+        const height = computedStyle.height;
+        const margin = computedStyle.margin;
+        
+        // Заменяем изображение на контейнер с изображением и кнопкой
+        container.innerHTML = `
+            <img src="${imgSrc}"
+                 alt="${img.alt || 'Изображение'}"
+                 style="max-width: 100%; max-height: 200px; display: block; margin: 0 auto;">
+            <button class="fullscreen-btn" onclick="window.openImagePreview('${imgSrc}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            </button>
+        `;
+        
+        // Применяем стили к контейнеру
+        container.style.position = 'relative';
+        container.style.width = width;
+        container.style.margin = margin;
+        
+        // Заменяем изображение на контейнер
+        img.parentNode.replaceChild(container, img);
+    });
+}
+
 // Функция для открытия предпросмотра изображения
 window.openImagePreview = function(src) {
     // Создаем модальное окно для просмотра изображения
@@ -634,6 +684,8 @@ function displayFiles(filesData) {
                         setTimeout(() => {
                             MathJax.typesetPromise([responseDiv]).then(() => {
                                 console.log("MathJax успешно обработал формулы");
+                                // Обрабатываем изображения в задаче после обработки MathJax
+                                processTaskImages();
                             }).catch(err => console.error('MathJax error:', err));
                         }, 100); // Небольшая задержка для уверенности, что DOM обновился
                     } else {
@@ -694,6 +746,8 @@ function displayFiles(filesData) {
                         setTimeout(() => {
                             MathJax.typesetPromise([responseDiv]).then(() => {
                                 console.log("MathJax успешно обработал формулы в результате проверки");
+                                // Обрабатываем изображения в задаче после обработки MathJax
+                                processTaskImages();
                             }).catch(err => console.error('MathJax error:', err));
                         }, 100); // Небольшая задержка для уверенности, что DOM обновился
                     } else {

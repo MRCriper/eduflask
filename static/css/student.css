@@ -627,10 +627,26 @@ main {
 }
 
 /* Стили для контейнера изображения с кнопкой полноэкранного режима */
-.image-container {
+.image-container, .task-image-container {
     position: relative;
     display: inline-block;
     width: 100%;
+    margin: 10px 0;
+}
+
+/* Стили для изображений в задачах на мобильных устройствах */
+.task-image-container {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.task-image-container img {
+    border: 1px solid #eee;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 5px;
 }
 
 .fullscreen-btn {
@@ -661,6 +677,22 @@ main {
 .fullscreen-btn svg {
     width: 20px;
     height: 20px;
+}
+
+/* Стили для адаптивных изображений в задачах */
+@media (max-width: 768px) {
+    .response img:not(.hint-img):not(.table-icon):not(.svg-icon) {
+        max-width: 100% !important;
+        height: auto !important;
+        display: block;
+        margin: 10px auto;
+    }
+    
+    .task-image-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 15px 0 !important;
+    }
 }
 
 .file-item p {
