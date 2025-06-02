@@ -454,6 +454,10 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     stats = db.relationship('UserStats', backref='user', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Метод для получения активной задачи пользователя
+    def get_active_task(self):
+        return Task.query.filter_by(user_id=self.id, is_active=True).first()
 
 
 class UserStats(db.Model):
@@ -469,11 +473,17 @@ class UserStats(db.Model):
 
 class Task(db.Model):
     id = db.Column(db.String(32), primary_key=True)  # Случайный ID
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Связь с пользователем
     html_output = db.Column(db.Text)  # HTML задачи
     hints = db.Column(db.Text)  # Подсказки (храним как JSON или текст)
     solve = db.Column(db.String(255))
     files_data = db.Column(db.Text)  # Ответ
+    subject = db.Column(db.String(50), nullable=True)  # Предмет задачи
+    is_active = db.Column(db.Boolean, default=True)  # Флаг активности задачи
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Связь с пользователем
+    user = db.relationship('User', backref=db.backref('tasks', lazy=True))
 
 
 # Создаем таблицу (если её нет)
@@ -552,16 +562,27 @@ def login():
 @app.route('/clear_task', methods=['POST'])
 @login_required
 def clear_task():
+    db_session = Session(db.engine)
     try:
+        user_id = session['user_id']
+        
+        # Деактивируем все активные задачи пользователя
+        active_tasks = db_session.query(Task).filter_by(user_id=user_id, is_active=True).all()
+        for task in active_tasks:
+            task.is_active = False
+        
+        # Удаляем ID задачи из сессии
         if 'task_id' in session:
-            task_id = session.pop('task_id')
-            Task.query.filter_by(id=task_id).delete()
-            db.session.commit()
+            session.pop('task_id')
+        
+        db_session.commit()
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Ошибка при очистке задачи: {str(e)}")
-        db.session.rollback()
+        db_session.rollback()
         return jsonify({'success': False, 'message': str(e)})
+    finally:
+        db_session.close()
 
 
 @app.route("/")
@@ -588,13 +609,82 @@ def check_auth():
 
 
 @app.route('/check_active_task')
+@login_required
 def check_active_task():
     try:
-        has_active_task = 'task_id' in session
+        db_session = Session(db.engine)
+        user = db_session.get(User, session['user_id'])
+        
+        if not user:
+            return jsonify({'has_active_task': False})
+        
+        # Проверяем наличие активной задачи в БД
+        active_task = db_session.query(Task).filter_by(user_id=user.id, is_active=True).first()
+        has_active_task = active_task is not None
+        
+        # Если есть активная задача, сохраняем её ID в сессии
+        if has_active_task and 'task_id' not in session:
+            session['task_id'] = active_task.id
+            session['current_subject'] = active_task.subject
+        
         return jsonify({'has_active_task': has_active_task})
     except Exception as e:
         logger.error(f"Ошибка при проверке активной задачи: {str(e)}")
         return jsonify({'has_active_task': False, 'error': str(e)})
+    finally:
+        db_session.close()
+
+@app.route('/get_active_task')
+@login_required
+def get_active_task():
+    try:
+        db_session = Session(db.engine)
+        user = db_session.get(User, session['user_id'])
+        
+        if not user:
+            return jsonify({'success': False, 'message': 'Пользователь не найден'})
+        
+        # Получаем активную задачу пользователя
+        active_task = db_session.query(Task).filter_by(user_id=user.id, is_active=True).first()
+        
+        if not active_task:
+            return jsonify({'success': False, 'message': 'Активная задача не найдена'})
+        
+        # Сохраняем ID задачи в сессии
+        session['task_id'] = active_task.id
+        session['current_subject'] = active_task.subject
+        
+        # Получаем файлы задачи
+        task_files = []
+        if active_task.files_data:
+            try:
+                task_files = json.loads(active_task.files_data)
+                # Проверяем и преобразуем формат файлов при необходимости
+                for file in task_files:
+                    if file.get('type') == 'image' and not file.get('source'):
+                        # Преобразуем в новый формат
+                        file['source'] = {
+                            'type': 'base64',
+                            'media_type': file.get('mimeType', 'image/jpeg'),
+                            'data': file.get('data', '')
+                        }
+            except Exception as e:
+                logger.error(f"Ошибка при обработке файлов задачи: {str(e)}")
+                task_files = []
+        
+        return jsonify({
+            'success': True,
+            'type': 'task',
+            'html': active_task.html_output,
+            'hints': active_task.hints.split("\n"),
+            'solve': '',  # Не отправляем решение клиенту
+            'task_files': task_files
+        })
+    except Exception as e:
+        logger.error(f"Ошибка при получении активной задачи: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
+    finally:
+        db_session.close()
 
 
 @app.route('/logout', methods=['POST'])
@@ -747,31 +837,36 @@ def student():
                                     processed_files.append(file_info)
 
                         if 'task_id' not in session:  # Первый запрос - генерация задачи
-                            result = get_response(request_text,
-                                                  processed_files)
-
-                            html_output, hints, solve = get_code(
-                                result['response'])
+                            # Проверяем, есть ли у пользователя активная задача
+                            user = db_session.get(User, session['user_id'])
+                            active_task = db_session.query(Task).filter_by(user_id=user.id, is_active=True).first()
+                            
+                            if active_task:
+                                # Если есть активная задача, деактивируем её
+                                active_task.is_active = False
+                                db_session.commit()
+                            
+                            result = get_response(request_text, processed_files)
+                            html_output, hints, solve = get_code(result['response'])
 
                             # Проверяем наличие обязательных полей
                             if html_output and solve and hints:
                                 # Сохраняем задачу в БД
-                                task_id = str(uuid.uuid4()).replace('-',
-                                                                    '')[:32]
+                                task_id = str(uuid.uuid4()).replace('-', '')[:32]
                                 new_task = Task(
                                     id=task_id,
+                                    user_id=session['user_id'],  # Привязываем задачу к пользователю
                                     html_output=html_output,
                                     hints="\n".join(hints),
                                     solve=solve,
-                                    files_data=json.dumps(files_data)
-                                    if files_data else
-                                    None  # Сохраняем предмет задачи
+                                    subject=result['subject'],  # Сохраняем предмет задачи
+                                    is_active=True,  # Устанавливаем флаг активности
+                                    files_data=json.dumps(files_data) if files_data else None
                                 )
-                                db.session.add(new_task)
-                                db.session.commit()
+                                db_session.add(new_task)
+                                db_session.commit()
                                 session['task_id'] = task_id
-                                session['current_subject'] = result[
-                                    'subject']  # Сохраняем предмет в сессии
+                                session['current_subject'] = result['subject']  # Сохраняем предмет в сессии
                                 success = True
 
                                 return jsonify({

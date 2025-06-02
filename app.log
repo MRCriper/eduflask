@@ -1491,3 +1491,8 @@ FileNotFoundError: [Errno 2] No such file or directory: '/usr/share/fonts/truety
 2025-04-30 01:44:05,826 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:44:05] "[36mGET /static/css/base.css HTTP/1.1[0m" 304 -
 2025-04-30 01:44:06,155 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:44:06] "GET /check_active_task HTTP/1.1" 200 -
 2025-04-30 01:44:06,265 - werkzeug - INFO - 127.0.0.1 - - [30/Apr/2025 01:44:06] "GET /static/img/send.png HTTP/1.1" 200 -
+2025-06-03 01:13:06,746 - __main__ - ERROR - Ошибка при миграции базы данных: 'Engine' object has no attribute 'execute'
+2025-06-03 01:15:02,595 - __main__ - INFO - Добавлена колонка user_id в таблицу Task
+2025-06-03 01:15:02,603 - __main__ - INFO - Добавлена колонка subject в таблицу Task
+2025-06-03 01:15:02,612 - __main__ - INFO - Добавлена колонка is_active в таблицу Task
+2025-06-03 01:15:02,624 - __main__ - INFO - Миграция базы данных успешно завершена

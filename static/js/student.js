@@ -3,16 +3,73 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM загружен, проверяем наличие MathJax");
 
-    // Проверяем, есть ли активная задача в сессии
+    // Проверяем, есть ли активная задача у пользователя
     fetch('/check_active_task')
         .then(response => response.json())
         .then(data => {
             if (data.has_active_task) {
-                // Показываем уведомление, что есть активная задача
-                showNotification('У вас есть активная задача. Для начала новой задачи нажмите кнопку "Следующая задача" после правильного ответа.', 'warning');
+                // Если есть активная задача, загружаем её
+                loadActiveTask();
             }
         })
         .catch(error => console.error('Ошибка при проверке активной задачи:', error));
+    
+    // Функция для загрузки активной задачи
+    function loadActiveTask() {
+        fetch('/get_active_task')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Отображаем задачу
+                    const responseDiv = document.querySelector('.response');
+                    if (responseDiv) {
+                        // Очищаем контейнер
+                        responseDiv.innerHTML = '';
+                        
+                        // Отображаем HTML задачи
+                        responseDiv.innerHTML = data.html;
+                        
+                        // Добавляем кнопку подсказки
+                        responseDiv.insertAdjacentHTML('afterbegin', `
+                            <div class="hint">
+                                <button type="button" class="hint-btn">
+                                    <img class="hint-img" src="/static/img/hint.png" alt="hint">
+                                </button>
+                            </div>
+                        `);
+                        
+                        // Инициализируем кнопку подсказки
+                        initHintButton(data.hints);
+                        
+                        // Изменяем placeholder для ввода
+                        const userInput = document.getElementById('userInput');
+                        if (userInput) {
+                            userInput.placeholder = "Введите ваше решение...";
+                        }
+                        
+                        // Отображаем файлы задачи, если они есть
+                        if (data.task_files && data.task_files.length > 0) {
+                            displayFiles(data.task_files);
+                        }
+                        
+                        // Обрабатываем математические формулы
+                        if (typeof MathJax !== 'undefined') {
+                            setTimeout(() => {
+                                MathJax.typesetPromise([responseDiv]).then(() => {
+                                    console.log("MathJax успешно обработал формулы");
+                                    // Обрабатываем изображения в задаче
+                                    processTaskImages();
+                                }).catch(err => console.error('MathJax error:', err));
+                            }, 100);
+                        }
+                        
+                        // Показываем уведомление
+                        showNotification('Загружена ваша активная задача. Для начала новой задачи нажмите кнопку "Следующая задача" после правильного ответа.', 'info');
+                    }
+                }
+            })
+            .catch(error => console.error('Ошибка при загрузке активной задачи:', error));
+    }
 
     // Функция для проверки и инициализации MathJax
     function initMathJax() {
