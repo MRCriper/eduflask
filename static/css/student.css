@@ -425,6 +425,7 @@ main {
 }
 
 .correct::before {
+    content: "✓";
     font-size: 1.2rem;
     margin-right: 8px;
 }
@@ -441,6 +442,7 @@ main {
 }
 
 .incorrect::before {
+    content: "✗";
     font-size: 1.2rem;
     margin-right: 8px;
 }
