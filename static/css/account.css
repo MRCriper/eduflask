@@ -504,6 +504,15 @@ td:last-child {
     height: 24px;
     display: block;
     margin: 0 auto;
+    object-fit: contain;
+    box-sizing: content-box;
+    padding: 2px;
+}
+
+th {
+    vertical-align: middle;
+    text-align: center;
+    min-width: 40px;
 }
 
 /* Адаптивные стили для таблицы */
