@@ -218,16 +218,16 @@ passwordForm.addEventListener('submit', async function(e) {
             
             switch (headerText) {
                 case 'Предмет':
-                    th.innerHTML = `<img src="/static/img/book.png" alt="Предмет" title="Предмет" class="table-icon">`;
+                    th.innerHTML = `<div class="icon-container"><img src="/static/img/book.png" alt="Предмет" title="Предмет" class="table-icon"></div>`;
                     break;
                 case 'Правильно':
-                    th.innerHTML = `<img src="/static/img/correct.png" alt="Правильно" title="Правильно" class="table-icon">`;
+                    th.innerHTML = `<div class="icon-container"><img src="/static/img/correct.png" alt="Правильно" title="Правильно" class="table-icon"></div>`;
                     break;
                 case 'Ошибки':
-                    th.innerHTML = `<img src="/static/img/incorrect.png" alt="Ошибки" title="Ошибки" class="table-icon">`;
+                    th.innerHTML = `<div class="icon-container"><img src="/static/img/incorrect.png" alt="Ошибки" title="Ошибки" class="table-icon"></div>`;
                     break;
                 case 'Процент':
-                    th.innerHTML = `<img src="/static/img/percentage.png" alt="Процент" title="Процент" class="table-icon">`;
+                    th.innerHTML = `<div class="icon-container"><img src="/static/img/percentage.png" alt="Процент" title="Процент" class="table-icon"></div>`;
                     break;
             }
         });
