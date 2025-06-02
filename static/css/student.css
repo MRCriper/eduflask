@@ -649,35 +649,7 @@ main {
     margin-bottom: 5px;
 }
 
-.fullscreen-btn {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0.7;
-    z-index: 5;
-}
-
-.fullscreen-btn:hover {
-    opacity: 1;
-    transform: scale(1.1);
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-.fullscreen-btn svg {
-    width: 20px;
-    height: 20px;
-}
+/* Стили для кнопки полноэкранного просмотра удалены, так как теперь используется клик по изображению */
 
 /* Стили для адаптивных изображений в задачах */
 @media (max-width: 768px) {

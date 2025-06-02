@@ -144,7 +144,7 @@ function processTaskImages() {
     
     images.forEach(img => {
         // Пропускаем изображения, которые уже обработаны
-        if (img.closest('.image-container')) return;
+        if (img.closest('.task-image-container')) return;
         
         // Получаем src изображения
         const imgSrc = img.src;
@@ -159,17 +159,21 @@ function processTaskImages() {
         const height = computedStyle.height;
         const margin = computedStyle.margin;
         
-        // Заменяем изображение на контейнер с изображением и кнопкой
-        container.innerHTML = `
-            <img src="${imgSrc}"
-                 alt="${img.alt || 'Изображение'}"
-                 style="max-width: 100%; max-height: 200px; display: block; margin: 0 auto;">
-            <button class="fullscreen-btn" onclick="window.openImagePreview('${imgSrc}')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-                </svg>
-            </button>
-        `;
+        // Создаем новое изображение с возможностью клика для открытия на весь экран
+        const newImg = document.createElement('img');
+        newImg.src = imgSrc;
+        newImg.alt = img.alt || 'Изображение';
+        newImg.style.maxWidth = '100%';
+        newImg.style.maxHeight = '300px';
+        newImg.style.display = 'block';
+        newImg.style.margin = '0 auto';
+        newImg.style.cursor = 'pointer';
+        newImg.onclick = function() {
+            window.openImagePreview(imgSrc);
+        };
+        
+        // Добавляем изображение в контейнер
+        container.appendChild(newImg);
         
         // Применяем стили к контейнеру
         container.style.position = 'relative';
@@ -505,12 +509,8 @@ function displayFiles(filesData) {
                             <div class="image-container">
                                 <img src="${imgSrc}"
                                      alt="Изображение"
-                                     style="max-width: 100%; max-height: 200px; cursor: pointer;">
-                                <button class="fullscreen-btn" onclick="window.openImagePreview('${imgSrc}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-                                    </svg>
-                                </button>
+                                     style="max-width: 100%; max-height: 200px; cursor: pointer;"
+                                     onclick="window.openImagePreview('${imgSrc}')">
                             </div>
                             <p>Изображение</p>
                         `;
@@ -532,12 +532,8 @@ function displayFiles(filesData) {
                             <div class="image-container">
                                 <img src="${imgSrc}"
                                      alt="${file.name || 'Изображение'}"
-                                     style="max-width: 100%; max-height: 200px; cursor: pointer;">
-                                <button class="fullscreen-btn" onclick="window.openImagePreview('${imgSrc}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-                                    </svg>
-                                </button>
+                                     style="max-width: 100%; max-height: 200px; cursor: pointer;"
+                                     onclick="window.openImagePreview('${imgSrc}')">
                             </div>
                             <p>${file.name}</p>
                         `;
