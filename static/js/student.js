@@ -1,4 +1,39 @@
 
+// Функция для инициализации кнопки подсказки
+function initHintButton(hints) {
+    const hintBtn = document.querySelector('.hint-btn');
+    if (!hintBtn) return;
+
+    let currentHintIndex = 0;
+
+    // Удаляем все существующие обработчики событий
+    const newHintBtn = hintBtn.cloneNode(true);
+    hintBtn.parentNode.replaceChild(newHintBtn, hintBtn);
+
+    newHintBtn.addEventListener('click', () => {
+        if (!hints || hints.length === 0) {
+            showNotification('Подсказки отсутствуют', 'warning');
+            return;
+        }
+
+        let hintDisplay = document.getElementById('hint-display');
+        if (!hintDisplay) {
+            hintDisplay = document.createElement('div');
+            hintDisplay.id = 'hint-display';
+            hintDisplay.style.marginTop = '10px';
+            hintDisplay.style.color = '#666';
+            document.querySelector('.response').appendChild(hintDisplay);
+        }
+
+        hintDisplay.innerHTML = `Подсказка ${currentHintIndex + 1}: ${hints[currentHintIndex]}`;
+        currentHintIndex = (currentHintIndex + 1) % hints.length;
+
+        if (typeof MathJax !== 'undefined') {
+            MathJax.typesetPromise([hintDisplay]);
+        }
+    });
+}
+
 // Инициализация MathJax при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM загружен, проверяем наличие MathJax");
@@ -657,36 +692,8 @@ function displayFiles(filesData) {
             responseDiv.innerHTML = '';
         }
 
-        // Добавим эту функцию для инициализации кнопки подсказки
-        function initHintButton(hints) {
-            const hintBtn = document.querySelector('.hint-btn');
-            if (!hintBtn) return;
-
-            let currentHintIndex = 0;
-
-            hintBtn.addEventListener('click', () => {
-                if (!hints || hints.length === 0) {
-                    showNotification('Подсказки отсутствуют', 'warning');
-                    return;
-                }
-
-                let hintDisplay = document.getElementById('hint-display');
-                if (!hintDisplay) {
-                    hintDisplay = document.createElement('div');
-                    hintDisplay.id = 'hint-display';
-                    hintDisplay.style.marginTop = '10px';
-                    hintDisplay.style.color = '#666';
-                    document.querySelector('.response').appendChild(hintDisplay);
-                }
-
-                hintDisplay.innerHTML = `Подсказка ${currentHintIndex + 1}: ${hints[currentHintIndex]}`;
-                currentHintIndex = (currentHintIndex + 1) % hints.length;
-
-                if (typeof MathJax !== 'undefined') {
-                    MathJax.typesetPromise([hintDisplay]);
-                }
-            });
-        }
+        // Используем глобальную функцию initHintButton
+        initHintButton(data.hints);
 
         try {
             const processedFiles = await processSelectedFiles(selectedFiles);
