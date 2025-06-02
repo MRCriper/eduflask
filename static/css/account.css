@@ -498,15 +498,35 @@ td:last-child {
     border-left-color: #c62828;
 }
 
-/* Стили для иконок в таблице на мобильных устройствах */
-.table-icon {
-    width: 24px !important;
-    height: 24px !important;
-    display: block !important;
-    margin: 0 auto !important;
-    object-fit: contain !important;
-    box-sizing: content-box !important;
-    padding: 2px !important;
+/* Стили для SVG-иконок в таблице */
+.svg-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.svg-icon {
+    width: 24px;
+    height: 24px;
+    stroke: white;
+    stroke-width: 2;
+    transition: all 0.3s ease;
+}
+
+.svg-icon-container:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.svg-icon-container:hover .svg-icon {
+    stroke-width: 2.5;
 }
 
 th {
@@ -522,7 +542,7 @@ th {
 @media (max-width: 768px) {
     table {
         width: 100%;
-        table-layout: fixed !important;
+        table-layout: fixed;
     }
     
     th, td {
@@ -532,21 +552,24 @@ th {
     
     th {
         padding: 0.5rem;
-        height: 50px !important;
-        width: 50px !important;
     }
     
     .stats-section h3 {
         font-size: 1.3rem;
     }
     
-    .icon-container {
-        width: 30px !important;
-        height: 30px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin: 0 auto !important;
+    /* Уменьшаем размер иконок на очень маленьких экранах */
+    @media (max-width: 400px) {
+        .svg-icon-container {
+            width: 32px;
+            height: 32px;
+            padding: 6px;
+        }
+        
+        .svg-icon {
+            width: 20px;
+            height: 20px;
+        }
     }
 }
 
