@@ -125,6 +125,12 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+// Функция для определения мобильного устройства
+function isMobileDevice() {
+    return (window.innerWidth <= 768) ||
+           (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+}
+
 // Функция для открытия предпросмотра изображения
 window.openImagePreview = function(src) {
     // Создаем модальное окно для просмотра изображения
@@ -441,21 +447,59 @@ function displayFiles(filesData) {
             if (file.type === 'image') {
                 // Проверяем, в новом ли формате файл
                 if (file.source && file.source.type === 'base64') {
-                    fileElement.innerHTML = `
-                        <img src="data:${file.source.media_type};base64,${file.source.data}" 
-                             alt="Изображение" 
-                             style="max-width: 300px; max-height: 200px; cursor: pointer;"
-                             onclick="window.openImagePreview('data:${file.source.media_type};base64,${file.source.data}')">
-                        <p>Изображение</p>
-                    `;
+                    const isMobile = isMobileDevice();
+                    const imgSrc = `data:${file.source.media_type};base64,${file.source.data}`;
+                    
+                    if (isMobile) {
+                        fileElement.innerHTML = `
+                            <div class="image-container">
+                                <img src="${imgSrc}"
+                                     alt="Изображение"
+                                     style="max-width: 100%; max-height: 200px; cursor: pointer;">
+                                <button class="fullscreen-btn" onclick="window.openImagePreview('${imgSrc}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p>Изображение</p>
+                        `;
+                    } else {
+                        fileElement.innerHTML = `
+                            <img src="${imgSrc}"
+                                 alt="Изображение"
+                                 style="max-width: 300px; max-height: 200px; cursor: pointer;"
+                                 onclick="window.openImagePreview('${imgSrc}')">
+                            <p>Изображение</p>
+                        `;
+                    }
                 } else {
-                    fileElement.innerHTML = `
-                        <img src="data:${file.mimeType};base64,${file.data}" 
-                             alt="${file.name || 'Изображение'}" 
-                             style="max-width: 300px; max-height: 200px; cursor: pointer;"
-                             onclick="window.openImagePreview('data:${file.mimeType};base64,${file.data}')">
-                        <p>${file.name}</p>
-                    `;
+                    const isMobile = isMobileDevice();
+                    const imgSrc = `data:${file.mimeType};base64,${file.data}`;
+                    
+                    if (isMobile) {
+                        fileElement.innerHTML = `
+                            <div class="image-container">
+                                <img src="${imgSrc}"
+                                     alt="${file.name || 'Изображение'}"
+                                     style="max-width: 100%; max-height: 200px; cursor: pointer;">
+                                <button class="fullscreen-btn" onclick="window.openImagePreview('${imgSrc}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p>${file.name}</p>
+                        `;
+                    } else {
+                        fileElement.innerHTML = `
+                            <img src="${imgSrc}"
+                                 alt="${file.name || 'Изображение'}"
+                                 style="max-width: 300px; max-height: 200px; cursor: pointer;"
+                                 onclick="window.openImagePreview('${imgSrc}')">
+                            <p>${file.name}</p>
+                        `;
+                    }
                 }
             } else {
                 // Проверяем, есть ли mimeType и data

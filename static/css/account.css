@@ -498,6 +498,34 @@ td:last-child {
     border-left-color: #c62828;
 }
 
+/* Стили для иконок в таблице на мобильных устройствах */
+.table-icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Адаптивные стили для таблицы */
+@media (max-width: 768px) {
+    table {
+        width: 100%;
+    }
+    
+    th, td {
+        padding: 0.8rem;
+        text-align: center;
+    }
+    
+    th {
+        padding: 0.5rem;
+    }
+    
+    .stats-section h3 {
+        font-size: 1.3rem;
+    }
+}
+
 .notification-close {
     background: none;
     border: none;

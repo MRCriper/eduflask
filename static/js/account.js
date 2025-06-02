@@ -1,4 +1,24 @@
+// Функция для определения мобильного устройства
+function isMobileDevice() {
+    return (window.innerWidth <= 768) ||
+           (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Адаптация таблицы для мобильных устройств
+    const isMobile = isMobileDevice();
+    if (isMobile) {
+        adaptTableForMobile();
+    }
+    
+    // Обработчик изменения размера окна для адаптации таблицы
+    window.addEventListener('resize', function() {
+        const currentIsMobile = isMobileDevice();
+        if (currentIsMobile !== isMobile) {
+            location.reload(); // Перезагрузка страницы при изменении типа устройства
+        }
+    });
+    
     // Инициализация модального окна смены пароля
     const changePasswordModal = document.getElementById('changePasswordModal');
     const changePasswordBtn = document.getElementById('changePasswordBtn');
@@ -185,5 +205,31 @@ passwordForm.addEventListener('submit', async function(e) {
         }
         errorElement.textContent = '';
         return true;
+    }
+    
+    // Функция для адаптации таблицы под мобильные устройства
+    function adaptTableForMobile() {
+        const tableHeaders = document.querySelectorAll('table th');
+        if (!tableHeaders.length) return;
+        
+        // Замена текстовых заголовков на иконки
+        tableHeaders.forEach((th, index) => {
+            const headerText = th.textContent.trim();
+            
+            switch (headerText) {
+                case 'Предмет':
+                    th.innerHTML = `<img src="/static/img/book.png" alt="Предмет" title="Предмет" class="table-icon">`;
+                    break;
+                case 'Правильно':
+                    th.innerHTML = `<img src="/static/img/correct.png" alt="Правильно" title="Правильно" class="table-icon">`;
+                    break;
+                case 'Ошибки':
+                    th.innerHTML = `<img src="/static/img/incorrect.png" alt="Ошибки" title="Ошибки" class="table-icon">`;
+                    break;
+                case 'Процент':
+                    th.innerHTML = `<img src="/static/img/percentage.png" alt="Процент" title="Процент" class="table-icon">`;
+                    break;
+            }
+        });
     }
 });
