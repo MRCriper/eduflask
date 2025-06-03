@@ -129,8 +129,6 @@ function displayFiles(filesData) {
 
 // Функция отправки запроса (определена в глобальной области видимости)
 async function submitForm() {
-    console.log("Функция submitForm() вызвана");
-    alert("Функция submitForm() вызвана");
     
     const input = document.getElementById('userInput');
 
