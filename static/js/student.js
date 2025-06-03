@@ -1,4 +1,233 @@
 
+// Глобальные переменные
+let selectedFiles = [];
+
+// Функция отправки запроса (определена в глобальной области видимости)
+async function submitForm() {
+    console.log("Функция submitForm() вызвана");
+    alert("Функция submitForm() вызвана");
+    
+    const input = document.getElementById('userInput');
+
+    // Проверяем существование элемента loading
+    let loading = document.getElementById('loading');
+    if (!loading) {
+        loading = document.createElement('div');
+        loading.id = 'loading';
+        loading.style.display = 'none';
+        loading.innerHTML = '<div class="spinner"></div><p>Загрузка...</p>';
+        document.querySelector('.common').appendChild(loading);
+    }
+
+    // Проверяем существование элемента responseDiv
+    const responseDiv = document.querySelector('.response');
+
+    if (!input.value.trim() && selectedFiles.length === 0) {
+        alert('Введите запрос или прикрепите файл');
+        return;
+    }
+
+    loading.style.display = 'flex';
+
+    // Проверяем существование responseDiv перед установкой innerHTML
+    if (responseDiv) {
+        responseDiv.innerHTML = '';
+    }
+
+    try {
+        const processedFiles = await processSelectedFiles(selectedFiles);
+        const response = await fetch('/student', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                request: input.value.trim(),
+                files: processedFiles
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.type === "verification" && data.task_files) {
+            // Показываем файлы при проверке
+            displayFiles(data.task_files);
+        }
+
+        console.log("Полученные данные:", data);
+
+        // Очищаем предыдущий контент
+        if (responseDiv) {
+            responseDiv.innerHTML = '';
+        }
+
+        if (data.type === "task") {
+            currentTask = data;
+            if (responseDiv) {
+                responseDiv.innerHTML = data.html;
+
+                // Добавляем кнопку подсказки
+                responseDiv.insertAdjacentHTML('afterbegin', `
+                    <div class="hint">
+                        <button type="button" class="hint-btn">
+                            <img class="hint-img" src="/static/img/hint.png" alt="hint">
+                        </button>
+                    </div>
+                `);
+
+                // Инициализируем кнопку подсказки
+                initHintButton(data.hints);
+                input.placeholder = "Введите ваше решение...";
+
+                // Обрабатываем математические формулы с помощью MathJax
+                if (typeof MathJax !== 'undefined') {
+                    console.log("Запуск обработки MathJax для задачи");
+                    setTimeout(() => {
+                        MathJax.typesetPromise([responseDiv]).then(() => {
+                            console.log("MathJax успешно обработал формулы");
+                            // Обрабатываем изображения в задаче после обработки MathJax
+                            processTaskImages();
+                        }).catch(err => console.error('MathJax error:', err));
+                    }, 100); // Небольшая задержка для уверенности, что DOM обновился
+                } else {
+                    console.error("MathJax не определен при обработке задачи");
+                }
+            }
+        } else if (data.type === "verification" && responseDiv) {
+            responseDiv.innerHTML = `
+                <div class="verification-result">
+                    <h4>Результат проверки:</h4>
+                    <div>${data.html}</div>
+                    ${data.is_correct ?
+                        '<div class="correct">Решение верное!</div>' :
+                        '<div class="incorrect">Есть ошибки</div>'}
+                </div>
+            `;
+            if (responseDiv) {
+                responseDiv.innerHTML += data.task_html;
+
+                    if (data.is_correct) {
+                        // Добавляем сообщение о необходимости нажать кнопку
+                        const instructionMsg = document.createElement('div');
+                        instructionMsg.className = 'instruction-message';
+                        instructionMsg.innerHTML = '<strong>Внимание!</strong> Чтобы начать новую задачу, нажмите кнопку "Следующая задача" ниже.';
+                        instructionMsg.style.color = '#ff5722';
+                        instructionMsg.style.padding = '10px';
+                        instructionMsg.style.margin = '10px 0';
+                        instructionMsg.style.backgroundColor = '#fff3e0';
+                        instructionMsg.style.borderRadius = '5px';
+                        instructionMsg.style.textAlign = 'center';
+
+                        // Добавляем кнопку "Следующая задача"
+                        const nextTaskBtn = document.createElement('button');
+                        nextTaskBtn.className = 'next-task-btn';
+                        nextTaskBtn.textContent = 'Следующая задача';
+
+                        nextTaskBtn.addEventListener('click', () => {
+                            // Очищаем сессию для новой задачи
+                            fetch('/clear_task', { method: 'POST' })
+                                .then(() => {
+                                    input.placeholder = "Введите запрос для новой задачи...";
+                                    const respDiv = document.querySelector('.response');
+                                    if (respDiv) {
+                                        respDiv.innerHTML = '<div class="placeholder-text">Здесь появится новая задача...</div>';
+                                    }
+                                    // Показываем уведомление об успешной очистке
+                                    showNotification('Сессия очищена. Теперь вы можете начать новую задачу!', 'success');
+                                });
+                        });
+
+                        responseDiv.appendChild(instructionMsg);
+                        responseDiv.appendChild(nextTaskBtn);
+                    }
+
+                // Обрабатываем математические формулы с помощью MathJax
+                if (typeof MathJax !== 'undefined') {
+                    console.log("Запуск обработки MathJax для результата проверки");
+                    setTimeout(() => {
+                        MathJax.typesetPromise([responseDiv]).then(() => {
+                            console.log("MathJax успешно обработал формулы в результате проверки");
+                            // Обрабатываем изображения в задаче после обработки MathJax
+                            processTaskImages();
+                        }).catch(err => console.error('MathJax error:', err));
+                    }, 100); // Небольшая задержка для уверенности, что DOM обновился
+                } else {
+                    console.error("MathJax не определен при обработке результата проверки");
+                }
+            }
+
+            responseDiv.insertAdjacentHTML('afterbegin', `
+                <div class="hint">
+                    <button type="button" class="hint-btn">
+                        <img class="hint-img" src="/static/img/hint.png" alt="hint">
+                    </button>
+                </div>
+            `);
+
+            // Инициализируем кнопку подсказки с помощью глобальной функции
+            initHintButton(data.hints);
+        }
+
+
+    } catch (error) {
+        console.error('Ошибка:', error);
+        if (responseDiv) {
+            responseDiv.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
+        }
+    } finally {
+        loading.style.display = 'none';
+        input.value = '';
+        selectedFiles = [];
+        updateFilePreview();
+    }
+}
+
+// Вспомогательные функции для обработки файлов
+async function processSelectedFiles(files) {
+    const results = [];
+
+    for (const file of files) {
+        try {
+            // Проверка размера файла (5MB максимум)
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`Файл ${file.name} слишком большой (максимум 5MB)`);
+                continue;
+            }
+
+            if (file.type.startsWith('image/')) {
+                // Сжимаем изображения перед отправкой
+                const compressedFile = await compressImage(file);
+                const base64 = await readFileAsBase64(compressedFile);
+                results.push({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": base64
+                    }
+                });
+            } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+                const text = await readFileAsText(file);
+                results.push({
+                    type: 'text',
+                    name: file.name,
+                    data: text
+                });
+            } else {
+                const base64 = await readFileAsBase64(file);
+                results.push({
+                    type: 'image', // Изменяем тип на image для совместимости
+                    mimeType: file.type,
+                    data: base64,
+                    name: file.name
+                });
+            }
+        } catch (error) {
+            console.error(`Ошибка обработки файла ${file.name}:`, error);
+        }
+    }
+
+    return results;
+}
+
 // Функция для инициализации кнопки подсказки
 function initHintButton(hints) {
     const hintBtn = document.querySelector('.hint-btn');
@@ -331,8 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filePreview = document.getElementById('filePreview');
     const attachBtn = document.querySelector('.attach-btn');
 
-    // Массив для хранения файлов
-    let selectedFiles = [];
+    // Используем глобальную переменную selectedFiles
 
     // Автоматическое изменение высоты textarea
     function autoResizeTextarea() {
@@ -440,53 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Обновленная функция processSelectedFiles
-    async function processSelectedFiles(files) {
-        const results = [];
-
-        for (const file of files) {
-            try {
-                // Проверка размера файла (5MB максимум)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert(`Файл ${file.name} слишком большой (максимум 5MB)`);
-                    continue;
-                }
-
-                if (file.type.startsWith('image/')) {
-                    // Сжимаем изображения перед отправкой
-                    const compressedFile = await compressImage(file);
-                    const base64 = await readFileAsBase64(compressedFile);
-                    results.push({
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "image/jpeg",
-                            "data": base64
-                        }
-                    });
-                } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-                    const text = await readFileAsText(file);
-                    results.push({
-                        type: 'text',
-                        name: file.name,
-                        data: text
-                    });
-                } else {
-                    const base64 = await readFileAsBase64(file);
-                    results.push({
-                        type: 'image', // Изменяем тип на image для совместимости
-                        mimeType: file.type,
-                        data: base64,
-                        name: file.name
-                    });
-                }
-            } catch (error) {
-                console.error(`Ошибка обработки файла ${file.name}:`, error);
-            }
-        }
-
-        return results;
-    }
+    // Используем глобальную функцию processSelectedFiles
 
     // Функция сжатия изображения
     async function compressImage(file, quality = 0.7) {
@@ -664,201 +846,5 @@ function displayFiles(filesData) {
 
     let currentTask = null;  // Для хранения состояния на клиенте
 
-    window.submitForm = async function() {
-        const input = document.getElementById('userInput');
-
-        // Проверяем существование элемента loading
-        let loading = document.getElementById('loading');
-        if (!loading) {
-            loading = document.createElement('div');
-            loading.id = 'loading';
-            loading.style.display = 'none';
-            loading.innerHTML = '<div class="spinner"></div><p>Загрузка...</p>';
-            document.querySelector('.common').appendChild(loading);
-        }
-
-        // Проверяем существование элемента responseDiv
-        const responseDiv = document.querySelector('.response');
-
-        if (!input.value.trim() && selectedFiles.length === 0) {
-            alert('Введите запрос или прикрепите файл');
-            return;
-        }
-
-        loading.style.display = 'flex';
-
-        // Проверяем существование responseDiv перед установкой innerHTML
-        if (responseDiv) {
-            responseDiv.innerHTML = '';
-        }
-
-        // Используем глобальную функцию initHintButton
-        initHintButton(data.hints);
-
-        try {
-            const processedFiles = await processSelectedFiles(selectedFiles);
-            const response = await fetch('/student', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    request: input.value.trim(),
-                    files: processedFiles
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.type === "verification" && data.task_files) {
-                // Показываем файлы при проверке
-                displayFiles(data.task_files);
-            }
-
-            console.log("Полученные данные:", data);
-
-            // Очищаем предыдущий контент
-            if (responseDiv) {
-                responseDiv.innerHTML = '';
-            }
-
-            if (data.type === "task") {
-                currentTask = data;
-                if (responseDiv) {
-                    responseDiv.innerHTML = data.html;
-
-                    // Добавляем кнопку подсказки
-                    responseDiv.insertAdjacentHTML('afterbegin', `
-                        <div class="hint">
-                            <button type="button" class="hint-btn">
-                                <img class="hint-img" src="/static/img/hint.png" alt="hint">
-                            </button>
-                        </div>
-                    `);
-
-                    // Инициализируем кнопку подсказки
-                    initHintButton(data.hints);
-                    input.placeholder = "Введите ваше решение...";
-
-                    // Обрабатываем математические формулы с помощью MathJax
-                    if (typeof MathJax !== 'undefined') {
-                        console.log("Запуск обработки MathJax для задачи");
-                        setTimeout(() => {
-                            MathJax.typesetPromise([responseDiv]).then(() => {
-                                console.log("MathJax успешно обработал формулы");
-                                // Обрабатываем изображения в задаче после обработки MathJax
-                                processTaskImages();
-                            }).catch(err => console.error('MathJax error:', err));
-                        }, 100); // Небольшая задержка для уверенности, что DOM обновился
-                    } else {
-                        console.error("MathJax не определен при обработке задачи");
-                    }
-                }
-            } else if (data.type === "verification" && responseDiv) {
-                responseDiv.innerHTML = `
-                    <div class="verification-result">
-                        <h4>Результат проверки:</h4>
-                        <div>${data.html}</div>
-                        ${data.is_correct ? 
-                            '<div class="correct">Решение верное!</div>' : 
-                            '<div class="incorrect">Есть ошибки</div>'}
-                    </div>
-                `;
-                if (responseDiv) {
-                    responseDiv.innerHTML += data.task_html;
-
-                        if (data.is_correct) {
-                            // Добавляем сообщение о необходимости нажать кнопку
-                            const instructionMsg = document.createElement('div');
-                            instructionMsg.className = 'instruction-message';
-                            instructionMsg.innerHTML = '<strong>Внимание!</strong> Чтобы начать новую задачу, нажмите кнопку "Следующая задача" ниже.';
-                            instructionMsg.style.color = '#ff5722';
-                            instructionMsg.style.padding = '10px';
-                            instructionMsg.style.margin = '10px 0';
-                            instructionMsg.style.backgroundColor = '#fff3e0';
-                            instructionMsg.style.borderRadius = '5px';
-                            instructionMsg.style.textAlign = 'center';
-
-                            // Добавляем кнопку "Следующая задача"
-                            const nextTaskBtn = document.createElement('button');
-                            nextTaskBtn.className = 'next-task-btn';
-                            nextTaskBtn.textContent = 'Следующая задача';
-
-                            nextTaskBtn.addEventListener('click', () => {
-                                // Очищаем сессию для новой задачи
-                                fetch('/clear_task', { method: 'POST' })
-                                    .then(() => {
-                                        input.placeholder = "Введите запрос для новой задачи...";
-                                        const respDiv = document.querySelector('.response');
-                                        if (respDiv) {
-                                            respDiv.innerHTML = '<div class="placeholder-text">Здесь появится новая задача...</div>';
-                                        }
-                                        // Показываем уведомление об успешной очистке
-                                        showNotification('Сессия очищена. Теперь вы можете начать новую задачу!', 'success');
-                                    });
-                            });
-
-                            responseDiv.appendChild(instructionMsg);
-                            responseDiv.appendChild(nextTaskBtn);
-                        }
-
-                    // Обрабатываем математические формулы с помощью MathJax
-                    if (typeof MathJax !== 'undefined') {
-                        console.log("Запуск обработки MathJax для результата проверки");
-                        setTimeout(() => {
-                            MathJax.typesetPromise([responseDiv]).then(() => {
-                                console.log("MathJax успешно обработал формулы в результате проверки");
-                                // Обрабатываем изображения в задаче после обработки MathJax
-                                processTaskImages();
-                            }).catch(err => console.error('MathJax error:', err));
-                        }, 100); // Небольшая задержка для уверенности, что DOM обновился
-                    } else {
-                        console.error("MathJax не определен при обработке результата проверки");
-                    }
-                }
-
-                responseDiv.insertAdjacentHTML('afterbegin', `
-                    <div class="hint">
-                        <button type="button" class="hint-btn">
-                            <img class="hint-img" src="/static/img/hint.png" alt="hint">
-                        </button>
-                    </div>
-                `);
-
-                // Вешаем обработчик на новую кнопку подсказки
-                const hintBtn = document.querySelector('.hint-btn');
-                if (hintBtn) {
-                    let currentHintIndex = 0;
-                    hintBtn.addEventListener('click', () => {
-                        if (data.hints && data.hints.length > 0) {
-                            let hintDisplay = document.getElementById('hint-display');
-                            if (!hintDisplay) {
-                                hintDisplay = document.createElement('div');
-                                hintDisplay.id = 'hint-display';
-                                hintDisplay.style.marginTop = '10px';
-                                hintDisplay.style.color = '#666';
-                                responseDiv.appendChild(hintDisplay);
-                            }
-
-                            hintDisplay.innerHTML = `Подсказка ${currentHintIndex + 1}: ${data.hints[currentHintIndex]}`;
-                            currentHintIndex = (currentHintIndex + 1) % data.hints.length;
-
-                            if (typeof MathJax !== 'undefined') {
-                                MathJax.typesetPromise([hintDisplay]);
-                            }
-                        }
-                    });
-                }
-            }
-
-
-        } catch (error) {
-            console.error('Ошибка:', error);
-            if (responseDiv) {
-                responseDiv.innerHTML = `<div class="error">Ошибка: ${error.message}</div>`;
-            }
-        } finally {
-            loading.style.display = 'none';
-            input.value = '';
-            selectedFiles = [];
-            updateFilePreview();
-        }
-    }});
+    // Конец обработчика DOMContentLoaded
+});

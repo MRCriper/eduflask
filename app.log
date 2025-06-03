@@ -1496,3 +1496,17 @@ FileNotFoundError: [Errno 2] No such file or directory: '/usr/share/fonts/truety
 2025-06-03 01:15:02,603 - __main__ - INFO - Добавлена колонка subject в таблицу Task
 2025-06-03 01:15:02,612 - __main__ - INFO - Добавлена колонка is_active в таблицу Task
 2025-06-03 01:15:02,624 - __main__ - INFO - Миграция базы данных успешно завершена
+2025-06-03 01:48:02,205 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-03 01:48:02,205 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-03 01:48:14,989 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:14] "[32mGET /student HTTP/1.1[0m" 302 -
+2025-06-03 01:48:15,002 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:15] "GET / HTTP/1.1" 200 -
+2025-06-03 01:48:15,101 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:15] "GET /static/css/index.css HTTP/1.1" 200 -
+2025-06-03 01:48:15,102 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:15] "GET /static/js/index.js HTTP/1.1" 200 -
+2025-06-03 01:48:15,104 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:15] "GET /static/css/base.css HTTP/1.1" 200 -
+2025-06-03 01:48:15,532 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:15] "GET /check_auth HTTP/1.1" 200 -
+2025-06-03 01:48:15,963 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:15] "GET /static/img/icon.png HTTP/1.1" 200 -
+2025-06-03 01:48:59,955 - werkzeug - INFO - 127.0.0.1 - - [03/Jun/2025 01:48:59] "POST /login HTTP/1.1" 200 -
+2025-06-03 01:49:17,008 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-03 01:49:17,009 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
