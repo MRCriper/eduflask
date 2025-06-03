@@ -2,6 +2,131 @@
 // Глобальные переменные
 let selectedFiles = [];
 
+// Функция для отображения файлов
+function displayFiles(filesData) {
+    // Проверяем существование контейнера для файлов
+    let filesContainer = document.querySelector('.files-container');
+
+    // Если контейнер не существует, создаем его
+    if (!filesContainer) {
+        filesContainer = document.createElement('div');
+        filesContainer.className = 'files-container';
+
+        // Создаем родительский элемент, если его нет
+        let taskFiles = document.getElementById('taskFiles');
+        if (!taskFiles) {
+            taskFiles = document.createElement('div');
+            taskFiles.id = 'taskFiles';
+            taskFiles.style.display = 'none';
+
+            // Проверяем существование элемента response
+            const responseDiv = document.querySelector('.response');
+            if (responseDiv) {
+                responseDiv.appendChild(taskFiles);
+            } else {
+                // Если элемент response не существует, создаем его
+                const responseContainer = document.createElement('div');
+                responseContainer.className = 'response';
+                responseContainer.appendChild(taskFiles);
+
+                // Добавляем его в .common или в body, если .common не существует
+                const commonDiv = document.querySelector('.common');
+                if (commonDiv) {
+                    commonDiv.appendChild(responseContainer);
+                } else {
+                    document.body.appendChild(responseContainer);
+                }
+            }
+        }
+
+        taskFiles.appendChild(filesContainer);
+    }
+
+    // Очищаем контейнер
+    filesContainer.innerHTML = '';
+
+    if (!filesData || filesData.length === 0) return;
+
+    // Показываем контейнер файлов
+    const taskFiles = document.getElementById('taskFiles');
+    if (taskFiles) taskFiles.style.display = 'block';
+
+        filesData.forEach(file => {
+            const fileElement = document.createElement('div');
+            fileElement.className = 'file-item';
+
+            if (file.type === 'image') {
+                // Проверяем, в новом ли формате файл
+                if (file.source && file.source.type === 'base64') {
+                    const isMobile = isMobileDevice();
+                    const imgSrc = `data:${file.source.media_type};base64,${file.source.data}`;
+                    
+                    if (isMobile) {
+                        fileElement.innerHTML = `
+                            <div class="image-container">
+                                <img src="${imgSrc}"
+                                     alt="Изображение"
+                                     style="max-width: 100%; max-height: 200px; cursor: pointer;"
+                                     onclick="window.openImagePreview('${imgSrc}')">
+                            </div>
+                            <p>Изображение</p>
+                        `;
+                    } else {
+                        fileElement.innerHTML = `
+                            <img src="${imgSrc}"
+                                 alt="Изображение"
+                                 style="max-width: 300px; max-height: 200px; cursor: pointer;"
+                                 onclick="window.openImagePreview('${imgSrc}')">
+                            <p>Изображение</p>
+                        `;
+                    }
+                } else {
+                    const isMobile = isMobileDevice();
+                    const imgSrc = `data:${file.mimeType};base64,${file.data}`;
+                    
+                    if (isMobile) {
+                        fileElement.innerHTML = `
+                            <div class="image-container">
+                                <img src="${imgSrc}"
+                                     alt="${file.name || 'Изображение'}"
+                                     style="max-width: 100%; max-height: 200px; cursor: pointer;"
+                                     onclick="window.openImagePreview('${imgSrc}')">
+                            </div>
+                            <p>${file.name}</p>
+                        `;
+                    } else {
+                        fileElement.innerHTML = `
+                            <img src="${imgSrc}"
+                                 alt="${file.name || 'Изображение'}"
+                                 style="max-width: 300px; max-height: 200px; cursor: pointer;"
+                                 onclick="window.openImagePreview('${imgSrc}')">
+                            <p>${file.name}</p>
+                        `;
+                    }
+                }
+            } else {
+                // Проверяем, есть ли mimeType и data
+                if (file.mimeType && file.data) {
+                    fileElement.innerHTML = `
+                        <a href="data:${file.mimeType};base64,${file.data}"
+                           download="${file.name || 'file'}"
+                           class="file-link">
+                            📄 ${file.name || 'Файл'}
+                        </a>
+                    `;
+                } else {
+                    fileElement.innerHTML = `
+                        <div class="file-link">
+                            📄 ${file.name || 'Файл'}
+                        </div>
+                    `;
+                }
+            }
+
+            filesContainer.appendChild(fileElement);
+        });
+}
+
 // Функция отправки запроса (определена в глобальной области видимости)
 async function submitForm() {
     console.log("Функция submitForm() вызвана");
@@ -720,129 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-function displayFiles(filesData) {
-    // Проверяем существование контейнера для файлов
-    let filesContainer = document.querySelector('.files-container');
-
-    // Если контейнер не существует, создаем его
-    if (!filesContainer) {
-        filesContainer = document.createElement('div');
-        filesContainer.className = 'files-container';
-
-        // Создаем родительский элемент, если его нет
-        let taskFiles = document.getElementById('taskFiles');
-        if (!taskFiles) {
-            taskFiles = document.createElement('div');
-            taskFiles.id = 'taskFiles';
-            taskFiles.style.display = 'none';
-
-            // Проверяем существование элемента response
-            const responseDiv = document.querySelector('.response');
-            if (responseDiv) {
-                responseDiv.appendChild(taskFiles);
-            } else {
-                // Если элемент response не существует, создаем его
-                const responseContainer = document.createElement('div');
-                responseContainer.className = 'response';
-                responseContainer.appendChild(taskFiles);
-
-                // Добавляем его в .common или в body, если .common не существует
-                const commonDiv = document.querySelector('.common');
-                if (commonDiv) {
-                    commonDiv.appendChild(responseContainer);
-                } else {
-                    document.body.appendChild(responseContainer);
-                }
-            }
-        }
-
-        taskFiles.appendChild(filesContainer);
-    }
-
-    // Очищаем контейнер
-    filesContainer.innerHTML = '';
-
-    if (!filesData || filesData.length === 0) return;
-
-    // Показываем контейнер файлов
-    const taskFiles = document.getElementById('taskFiles');
-    if (taskFiles) taskFiles.style.display = 'block';
-
-        filesData.forEach(file => {
-            const fileElement = document.createElement('div');
-            fileElement.className = 'file-item';
-
-            if (file.type === 'image') {
-                // Проверяем, в новом ли формате файл
-                if (file.source && file.source.type === 'base64') {
-                    const isMobile = isMobileDevice();
-                    const imgSrc = `data:${file.source.media_type};base64,${file.source.data}`;
-                    
-                    if (isMobile) {
-                        fileElement.innerHTML = `
-                            <div class="image-container">
-                                <img src="${imgSrc}"
-                                     alt="Изображение"
-                                     style="max-width: 100%; max-height: 200px; cursor: pointer;"
-                                     onclick="window.openImagePreview('${imgSrc}')">
-                            </div>
-                            <p>Изображение</p>
-                        `;
-                    } else {
-                        fileElement.innerHTML = `
-                            <img src="${imgSrc}"
-                                 alt="Изображение"
-                                 style="max-width: 300px; max-height: 200px; cursor: pointer;"
-                                 onclick="window.openImagePreview('${imgSrc}')">
-                            <p>Изображение</p>
-                        `;
-                    }
-                } else {
-                    const isMobile = isMobileDevice();
-                    const imgSrc = `data:${file.mimeType};base64,${file.data}`;
-                    
-                    if (isMobile) {
-                        fileElement.innerHTML = `
-                            <div class="image-container">
-                                <img src="${imgSrc}"
-                                     alt="${file.name || 'Изображение'}"
-                                     style="max-width: 100%; max-height: 200px; cursor: pointer;"
-                                     onclick="window.openImagePreview('${imgSrc}')">
-                            </div>
-                            <p>${file.name}</p>
-                        `;
-                    } else {
-                        fileElement.innerHTML = `
-                            <img src="${imgSrc}"
-                                 alt="${file.name || 'Изображение'}"
-                                 style="max-width: 300px; max-height: 200px; cursor: pointer;"
-                                 onclick="window.openImagePreview('${imgSrc}')">
-                            <p>${file.name}</p>
-                        `;
-                    }
-                }
-            } else {
-                // Проверяем, есть ли mimeType и data
-                if (file.mimeType && file.data) {
-                    fileElement.innerHTML = `
-                        <a href="data:${file.mimeType};base64,${file.data}" 
-                           download="${file.name || 'file'}" 
-                           class="file-link">
-                            📄 ${file.name || 'Файл'}
-                        </a>
-                    `;
-                } else {
-                    fileElement.innerHTML = `
-                        <div class="file-link">
-                            📄 ${file.name || 'Файл'}
-                        </div>
-                    `;
-                }
-            }
-
-            filesContainer.appendChild(fileElement);
-        });
-    }
+// Удаляем определение функции displayFiles из этого места, так как мы переместили ее в глобальную область видимости
 
     let currentTask = null;  // Для хранения состояния на клиенте
 
