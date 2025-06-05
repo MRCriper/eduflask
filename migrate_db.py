@@ -64,13 +64,19 @@ def migrate_database():
             tasks = db.session.query(Task).all()
             for task in tasks:
                 # Устанавливаем значения по умолчанию для новых полей
-                if 'user_id' in new_columns and task.user_id is None:
+                if 'user_id' in new_task_columns and task.user_id is None:
                     # Если задача не привязана к пользователю, деактивируем её
                     task.is_active = False
                 
-                if 'subject' in new_columns and task.subject is None:
+                if 'subject' in new_task_columns and task.subject is None:
                     # Устанавливаем предмет по умолчанию
                     task.subject = "Другое"
+            
+            # Устанавливаем значение first_login для всех пользователей
+            if 'first_login' in new_user_columns:
+                users = db.session.query(User).all()
+                for user in users:
+                    user.first_login = True
             
             db.session.commit()
             logger.info("Миграция базы данных успешно завершена")
