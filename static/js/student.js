@@ -691,6 +691,12 @@ window.openImagePreview = function(src) {
     modal.style.justifyContent = 'center';
     modal.style.alignItems = 'center';
     modal.style.zIndex = '1000';
+    modal.className = 'modal-image-preview';
+    
+    // Добавляем класс для темной темы, если она активна
+    if (document.documentElement.classList.contains('dark-theme')) {
+        modal.classList.add('dark-theme');
+    }
 
     // Создаем изображение
     const img = document.createElement('img');
@@ -698,13 +704,43 @@ window.openImagePreview = function(src) {
     img.style.maxWidth = '90%';
     img.style.maxHeight = '90%';
     img.style.objectFit = 'contain';
+    img.style.borderRadius = '8px';
 
     // Добавляем изображение в модальное окно
     modal.appendChild(img);
 
-    // Закрытие модального окна при клике
-    modal.addEventListener('click', () => {
+    // Создаем кнопку закрытия
+    const closeBtn = document.createElement('div');
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '20px';
+    closeBtn.style.right = '20px';
+    closeBtn.style.color = 'white';
+    closeBtn.style.fontSize = '30px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.width = '40px';
+    closeBtn.style.height = '40px';
+    closeBtn.style.display = 'flex';
+    closeBtn.style.justifyContent = 'center';
+    closeBtn.style.alignItems = 'center';
+    closeBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    closeBtn.style.borderRadius = '50%';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'close-btn';
+    
+    // Добавляем кнопку закрытия в модальное окно
+    modal.appendChild(closeBtn);
+    
+    // Закрытие модального окна при клике на кнопку закрытия
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         document.body.removeChild(modal);
+    });
+    
+    // Закрытие модального окна при клике на фон
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
     });
 
     // Добавляем модальное окно в body
