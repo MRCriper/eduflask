@@ -48,7 +48,7 @@ const Onboarding = {
             element: '.theme-toggle',
             title: 'Смена темы',
             content: 'Нажмите эту кнопку, чтобы переключиться между светлой и темной темой.',
-            position: 'bottom',
+            position: 'left',
             highlight: true
         },
         {
