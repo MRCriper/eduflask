@@ -28,6 +28,27 @@
     color: var(--text-light);
 }
 
+/* Стили для формы ввода */
+.dark-theme form {
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: rgba(70, 70, 70, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+/* Стили для формы запроса */
+.dark-theme #requestForm {
+    background-color: rgba(70, 70, 70, 0.9);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme #requestForm:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    border-color: var(--primary-color);
+}
+
 /* Стили для контейнеров в темной теме */
 .dark-theme .common {
     background: rgba(60, 60, 60, 0.7);
