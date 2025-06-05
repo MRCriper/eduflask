@@ -91,26 +91,26 @@ const Onboarding = {
         {
             element: '.user-info',
             title: 'Информация о пользователе',
-            content: 'Здесь отображается ваша информация: имя пользователя и email.',
+            content: 'Здесь отображается ваша информация: имя пользователя.',
             position: 'bottom',
             highlight: true
         },
         {
-            element: '.statistics',
+            element: '.stats-section',
             title: 'Статистика',
             content: 'Здесь вы можете видеть статистику решенных задач по предметам.',
             position: 'top',
             highlight: true
         },
         {
-            element: '.table',
+            element: 'table',
             title: 'Таблица результатов',
             content: 'В этой таблице отображаются ваши результаты по предметам: количество правильных и неправильных ответов, а также процент успешности.',
             position: 'top',
             highlight: true
         },
         {
-            element: '.back-btn',
+            element: '#backBtn',
             title: 'Вернуться назад',
             content: 'Нажмите эту кнопку, чтобы вернуться на страницу с задачами.',
             position: 'right',
@@ -273,6 +273,9 @@ const Onboarding = {
             return;
         }
         
+        // Прокручиваем страницу, чтобы элемент был виден
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
         // Подсвечиваем элемент
         if (step.highlight) {
             element.classList.add('onboarding-highlight');
@@ -324,40 +327,61 @@ const Onboarding = {
     positionTooltip: function(tooltip, element, position) {
         const rect = element.getBoundingClientRect();
         const tooltipRect = tooltip.getBoundingClientRect();
+        const isMobile = window.innerWidth <= 768;
         
-        // Позиционируем в зависимости от указанной позиции
-        switch (position) {
-            case 'top':
-                tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-                tooltip.style.top = `${rect.top - tooltipRect.height - 15}px`;
-                break;
-            case 'bottom':
-                tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-                tooltip.style.top = `${rect.bottom + 15}px`;
-                break;
-            case 'left':
-                tooltip.style.left = `${rect.left - tooltipRect.width - 15}px`;
-                tooltip.style.top = `${rect.top + rect.height / 2 - tooltipRect.height / 2}px`;
-                break;
-            case 'right':
-                tooltip.style.left = `${rect.right + 15}px`;
-                tooltip.style.top = `${rect.top + rect.height / 2 - tooltipRect.height / 2}px`;
-                break;
-        }
-        
-        // Проверяем, не выходит ли подсказка за пределы экрана
-        const tooltipRect2 = tooltip.getBoundingClientRect();
-        
-        if (tooltipRect2.left < 10) {
-            tooltip.style.left = '10px';
-        } else if (tooltipRect2.right > window.innerWidth - 10) {
-            tooltip.style.left = `${window.innerWidth - tooltipRect2.width - 10}px`;
-        }
-        
-        if (tooltipRect2.top < 10) {
-            tooltip.style.top = '10px';
-        } else if (tooltipRect2.bottom > window.innerHeight - 10) {
-            tooltip.style.top = `${window.innerHeight - tooltipRect2.height - 10}px`;
+        // Для мобильных устройств используем другое позиционирование
+        if (isMobile) {
+            // На мобильных устройствах всегда показываем подсказку по центру экрана
+            tooltip.style.left = `${(window.innerWidth - tooltipRect.width) / 2}px`;
+            tooltip.style.top = `${Math.min(rect.top + window.scrollY - tooltipRect.height - 20, window.innerHeight / 2)}px`;
+            
+            // Если подсказка выходит за верхнюю границу экрана, показываем ее ниже элемента
+            if (parseFloat(tooltip.style.top) < 50) {
+                tooltip.style.top = `${rect.bottom + window.scrollY + 20}px`;
+            }
+            
+            // Убедимся, что подсказка не выходит за пределы экрана
+            const tooltipTop = parseFloat(tooltip.style.top);
+            if (tooltipTop < 10) {
+                tooltip.style.top = '10px';
+            } else if (tooltipTop + tooltipRect.height > window.innerHeight - 10) {
+                tooltip.style.top = `${window.innerHeight - tooltipRect.height - 10}px`;
+            }
+        } else {
+            // Для десктопов используем обычное позиционирование
+            switch (position) {
+                case 'top':
+                    tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
+                    tooltip.style.top = `${rect.top - tooltipRect.height - 15}px`;
+                    break;
+                case 'bottom':
+                    tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
+                    tooltip.style.top = `${rect.bottom + 15}px`;
+                    break;
+                case 'left':
+                    tooltip.style.left = `${rect.left - tooltipRect.width - 15}px`;
+                    tooltip.style.top = `${rect.top + rect.height / 2 - tooltipRect.height / 2}px`;
+                    break;
+                case 'right':
+                    tooltip.style.left = `${rect.right + 15}px`;
+                    tooltip.style.top = `${rect.top + rect.height / 2 - tooltipRect.height / 2}px`;
+                    break;
+            }
+            
+            // Проверяем, не выходит ли подсказка за пределы экрана
+            const tooltipRect2 = tooltip.getBoundingClientRect();
+            
+            if (tooltipRect2.left < 10) {
+                tooltip.style.left = '10px';
+            } else if (tooltipRect2.right > window.innerWidth - 10) {
+                tooltip.style.left = `${window.innerWidth - tooltipRect2.width - 10}px`;
+            }
+            
+            if (tooltipRect2.top < 10) {
+                tooltip.style.top = '10px';
+            } else if (tooltipRect2.bottom > window.innerHeight - 10) {
+                tooltip.style.top = `${window.innerHeight - tooltipRect2.height - 10}px`;
+            }
         }
     },
     
