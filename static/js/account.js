@@ -1,3 +1,51 @@
+// Функции для работы с темной темой
+function initTheme() {
+    // Проверяем, есть ли сохраненная тема
+    const savedTheme = localStorage.getItem('theme');
+    
+    // Если есть сохраненная тема, применяем ее
+    if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-theme');
+        updateThemeIcon();
+    }
+    
+    // Добавляем обработчик события для кнопки переключения темы
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+}
+
+// Функция для переключения темы
+function toggleTheme() {
+    // Добавляем класс для плавного перехода
+    document.body.classList.add('theme-transition');
+    
+    // Переключаем класс темной темы
+    document.documentElement.classList.toggle('dark-theme');
+    
+    // Обновляем иконку
+    updateThemeIcon();
+    
+    // Сохраняем выбранную тему в localStorage
+    const isDarkTheme = document.documentElement.classList.contains('dark-theme');
+    localStorage.setItem('theme', isDarkTheme ? 'dark' : 'light');
+    
+    // Удаляем класс перехода после завершения анимации
+    setTimeout(() => {
+        document.body.classList.remove('theme-transition');
+    }, 500);
+}
+
+// Функция для обновления иконки темы
+function updateThemeIcon() {
+    const themeIcon = document.querySelector('.theme-icon');
+    if (themeIcon) {
+        const isDarkTheme = document.documentElement.classList.contains('dark-theme');
+        themeIcon.textContent = isDarkTheme ? '☀️' : '🌙';
+    }
+}
+
 // Функция для определения мобильного устройства
 function isMobileDevice() {
     return (window.innerWidth <= 768) ||
@@ -5,6 +53,9 @@ function isMobileDevice() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Инициализируем тему
+    initTheme();
+    
     // Адаптация таблицы для мобильных устройств
     const isMobile = isMobileDevice();
     if (isMobile) {

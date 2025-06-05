@@ -80,6 +80,38 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Стили для кнопки переключения темы */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    margin-right: 10px;
+}
+
+.theme-toggle:hover {
+    transform: rotate(30deg);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-icon {
+    font-style: normal;
+}
+
 .account .acc-img {
     width: 48px;
     height: 48px;

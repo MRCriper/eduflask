@@ -1,0 +1,128 @@
+/* Темная тема для приложения */
+:root.dark-theme {
+    --primary-color: #7986cb;
+    --primary-light: #aab6fe;
+    --primary-dark: #49599a;
+    --accent-color: #00bcd4;
+    --text-light: #e3f2fd;
+    --text-dark: #121212;
+    --error-color: #f44336;
+    --success-color: #4CAF50;
+    --warning-color: #FF9800;
+    --background-gradient: linear-gradient(135deg, #1a237e, #303f9f);
+    --card-background: rgba(30, 30, 30, 0.95);
+    --transition-speed: 0.3s;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 20px;
+}
+
+/* Основные стили для темной темы */
+.dark-theme body {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><path fill="rgba(255,255,255,0.03)" d="M30,10L50,30L70,10L90,30L70,50L90,70L70,90L50,70L30,90L10,70L30,50L10,30Z"/></svg>'), var(--background-gradient);
+    background-size: 300px, cover;
+    color: var(--text-light);
+}
+
+/* Стили для контейнеров в темной теме */
+.dark-theme .common {
+    background: rgba(30, 30, 30, 0.7);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .response {
+    background: rgba(40, 40, 40, 0.8);
+    color: var(--text-light);
+}
+
+.dark-theme .request {
+    background: rgba(50, 50, 50, 0.9);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .request::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Стили для кнопок в темной теме */
+.dark-theme button {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.dark-theme .send {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+/* Стили для подсказок в темной теме */
+.dark-theme .hint-btn {
+    background: rgba(40, 40, 40, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Стили для изображений в темной теме */
+.dark-theme .file-item {
+    background: rgba(40, 40, 40, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Стили для модальных окон в темной теме */
+.dark-theme .modal-content {
+    background: rgba(30, 30, 30, 0.95);
+    color: var(--text-light);
+}
+
+/* Стили для личного кабинета в темной теме */
+.dark-theme .account-container {
+    background: rgba(30, 30, 30, 0.7);
+}
+
+.dark-theme .user-info {
+    background: rgba(40, 40, 40, 0.8);
+}
+
+.dark-theme table {
+    background: rgba(40, 40, 40, 0.8);
+}
+
+.dark-theme th {
+    background: rgba(20, 20, 20, 0.8);
+}
+
+.dark-theme tr:hover td {
+    background: rgba(60, 60, 60, 0.5);
+}
+
+/* Стили для кнопки переключения темы */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle:hover {
+    transform: rotate(30deg);
+}
+
+.dark-theme .theme-toggle .theme-icon {
+    content: '☀️';
+}
+
+/* Анимация переключения темы */
+.theme-transition {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+}

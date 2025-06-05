@@ -12,7 +12,12 @@
     <!-- Уведомления будут появляться здесь -->
 </div>
 <div class="account-container">
-    <h2>Личный кабинет</h2>
+    <div class="account-header">
+        <h2>Личный кабинет</h2>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="theme-icon">🌙</i>
+        </button>
+    </div>
     <div class="user-info">
         <p>Пользователь: <strong>{{ current_user.username }}</strong></p>
     </div>

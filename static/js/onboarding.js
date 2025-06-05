@@ -45,6 +45,13 @@ const Onboarding = {
             highlight: true
         },
         {
+            element: '.theme-toggle',
+            title: 'Смена темы',
+            content: 'Нажмите эту кнопку, чтобы переключиться между светлой и темной темой.',
+            position: 'bottom',
+            highlight: true
+        },
+        {
             element: '.user-icon',
             title: 'Личный кабинет',
             content: 'Здесь вы можете перейти в личный кабинет для просмотра статистики и управления аккаунтом.',
@@ -89,6 +96,13 @@ const Onboarding = {
     // Шаги обучения для страницы личного кабинета
     accountSteps: [
         {
+            element: '.account-container h2',
+            title: 'Личный кабинет',
+            content: 'Здесь вы можете просматривать свою статистику и управлять аккаунтом.',
+            position: 'bottom',
+            highlight: true
+        },
+        {
             element: '.user-info',
             title: 'Информация о пользователе',
             content: 'Здесь отображается ваша информация: имя пользователя.',
@@ -96,21 +110,21 @@ const Onboarding = {
             highlight: true
         },
         {
-            element: '.stats-section',
+            element: '.statistics',
             title: 'Статистика',
             content: 'Здесь вы можете видеть статистику решенных задач по предметам.',
             position: 'top',
             highlight: true
         },
         {
-            element: 'table',
+            element: '.table',
             title: 'Таблица результатов',
             content: 'В этой таблице отображаются ваши результаты по предметам: количество правильных и неправильных ответов, а также процент успешности.',
             position: 'top',
             highlight: true
         },
         {
-            element: '#backBtn',
+            element: '.back-btn',
             title: 'Вернуться назад',
             content: 'Нажмите эту кнопку, чтобы вернуться на страницу с задачами.',
             position: 'right',
@@ -142,6 +156,34 @@ const Onboarding = {
         // Добавляем обработчик для отображения обучения после получения задачи
         if (this.currentPage === 'student') {
             this.setupTaskObserver();
+        }
+        
+        // Проверяем, нужно ли показывать обучение по задаче после возвращения из личного кабинета
+        if (this.currentPage === 'student' && localStorage.getItem('returnFromAccount') === 'true') {
+            localStorage.removeItem('returnFromAccount');
+            
+            // Проверяем, есть ли задача на странице
+            const hasTask = document.querySelector('.hint-btn') !== null || document.querySelector('.file-item') !== null;
+            
+            if (hasTask && localStorage.getItem('taskTutorialShown') !== 'true') {
+                // Запускаем обучение для задачи с небольшой задержкой
+                setTimeout(() => {
+                    this.startTaskOnboarding();
+                }, 1000);
+                
+                // Устанавливаем флаг, что обучение для задачи было показано
+                localStorage.setItem('taskTutorialShown', 'true');
+            }
+        }
+        
+        // Если пользователь уходит с личного кабинета, устанавливаем флаг
+        if (this.currentPage === 'account') {
+            const backBtn = document.querySelector('.back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    localStorage.setItem('returnFromAccount', 'true');
+                });
+            }
         }
     },
     
