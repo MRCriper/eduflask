@@ -4,6 +4,7 @@
 {% block link %}
 <link rel="stylesheet" href="{{ url_for("static", filename="css/account.css") }}">
 <script src="{{ url_for("static", filename="js/account.js") }}"></script>
+<script src="{{ url_for("static", filename="js/onboarding.js") }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -16,9 +17,9 @@
         <p>Пользователь: <strong>{{ current_user.username }}</strong></p>
     </div>
     
-    <div class="stats-section">
+    <div class="stats-section statistics">
         <h3>Статистика</h3>
-        <table>
+        <table class="table">
             <thead>
                 <tr>
                     <th>Предмет</th>
@@ -41,7 +42,7 @@
     </div>
     
     <div class="account-actions">
-        <button id="backBtn">Назад</button>
+        <button id="backBtn" class="back-btn">Назад</button>
         <button id="changePasswordBtn">Сменить пароль</button>
         <button id="logoutBtn">Выйти</button>
     </div>

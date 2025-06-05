@@ -454,6 +454,7 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     stats = db.relationship('UserStats', backref='user', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    first_login = db.Column(db.Boolean, default=True)  # Флаг первого входа
     
     # Метод для получения активной задачи пользователя
     def get_active_task(self):
@@ -607,6 +608,31 @@ def check_auth():
         logger.error(f"Ошибка при проверке аутентификации: {str(e)}")
         return jsonify({'authenticated': False, 'error': str(e)})
 
+
+@app.route('/check_first_login')
+@login_required
+def check_first_login():
+    try:
+        db_session = Session(db.engine)
+        user = db_session.get(User, session['user_id'])
+        
+        if not user:
+            return jsonify({'is_first_login': False})
+        
+        # Проверяем, первый ли это вход пользователя
+        is_first_login = user.first_login
+        
+        # Если это первый вход, устанавливаем флаг в False
+        if is_first_login:
+            user.first_login = False
+            db_session.commit()
+        
+        return jsonify({'is_first_login': is_first_login})
+    except Exception as e:
+        logger.error(f"Ошибка при проверке первого входа: {str(e)}")
+        return jsonify({'is_first_login': False, 'error': str(e)})
+    finally:
+        db_session.close()
 
 @app.route('/check_active_task')
 @login_required
