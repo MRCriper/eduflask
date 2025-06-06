@@ -248,6 +248,7 @@
 /* Стили для модального окна календаря ударного режима в темной теме */
 .dark-theme .streak-calendar-modal {
     background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
 }
 
 .dark-theme .calendar-container {
@@ -255,35 +256,131 @@
     color: var(--text-light);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-lg);
+    border-radius: var(--border-radius-lg);
 }
 
 .dark-theme .calendar-container h2 {
     color: var(--text-light);
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Стили для информации о текущей и максимальной серии */
+.dark-theme .streak-info {
+    color: var(--text-light);
+    opacity: 0.8;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1rem;
 }
 
 .dark-theme .calendar-container button {
     color: var(--text-light);
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .dark-theme .calendar-container button:hover {
     color: var(--primary-light);
+    transform: scale(1.1);
+}
+
+/* Стили для кнопки закрытия */
+.dark-theme .calendar-container .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(60, 60, 60, 0.7);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .calendar-container .close-btn:hover {
+    background-color: rgba(80, 80, 80, 0.9);
+    transform: scale(1.1);
 }
 
 .dark-theme .month-calendar h3 {
     color: var(--text-light);
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .dark-theme .month-calendar th {
     background-color: rgba(0, 0, 0, 0.3);
     color: var(--text-light);
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+    padding: 10px;
 }
 
 .dark-theme .month-calendar td {
     color: var(--text-light);
+    opacity: 0.8;
+    padding: 10px;
+    text-align: center;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
+}
+
+/* Стили для активного дня */
+.dark-theme .month-calendar td.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    opacity: 1;
+}
+
+/* Стили для дней с ударным режимом */
+.dark-theme .month-calendar td.streak-day {
+    color: var(--primary-light);
+    font-weight: 500;
+    opacity: 1;
+}
+
+/* Стили для неактивных дней */
+.dark-theme .month-calendar td.inactive {
+    opacity: 0.4;
 }
 
 .dark-theme .month-calendar table {
     background-color: transparent;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    box-shadow: none;
+}
+
+/* Стили для дней недели */
+.dark-theme .month-calendar .weekday {
+    background-color: rgba(60, 60, 60, 0.5);
+    border-radius: var(--border-radius-sm);
+    padding: 8px 12px;
+    margin: 0 2px;
+    display: inline-block;
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
 /* Стили для личного кабинета в темной теме */
