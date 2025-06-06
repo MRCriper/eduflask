@@ -245,6 +245,47 @@
     color: var(--text-light);
 }
 
+/* Стили для модального окна календаря ударного режима в темной теме */
+.dark-theme .streak-calendar-modal {
+    background-color: rgba(0, 0, 0, 0.85);
+}
+
+.dark-theme .calendar-container {
+    background-color: rgba(30, 30, 30, 0.95);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.dark-theme .calendar-container h2 {
+    color: var(--text-light);
+}
+
+.dark-theme .calendar-container button {
+    color: var(--text-light);
+}
+
+.dark-theme .calendar-container button:hover {
+    color: var(--primary-light);
+}
+
+.dark-theme .month-calendar h3 {
+    color: var(--text-light);
+}
+
+.dark-theme .month-calendar th {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: var(--text-light);
+}
+
+.dark-theme .month-calendar td {
+    color: var(--text-light);
+}
+
+.dark-theme .month-calendar table {
+    background-color: transparent;
+}
+
 /* Стили для личного кабинета в темной теме */
 .dark-theme .account-container {
     background: rgba(30, 30, 30, 0.7);
