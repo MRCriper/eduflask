@@ -175,6 +175,23 @@
     background-color: var(--primary-dark);
 }
 
+/* Стили для элемента проверки решения */
+.dark-theme .verification-result {
+    background-color: var(--border-color);
+    color: var(--text-light);
+    border-radius: var(--border-radius-md);
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.dark-theme .verification-result h4 {
+    color: var(--text-light);
+}
+
+.dark-theme .verification-result div {
+    color: var(--text-light);
+}
+
 /* Стили для модального окна просмотра изображений */
 .dark-theme .modal-image-preview {
     background-color: rgba(60, 60, 60, 0.9) !important;
