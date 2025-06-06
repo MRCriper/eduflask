@@ -32,7 +32,7 @@
 .dark-theme form {
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius-md);
-    background: rgba(70, 70, 70, 0.9);
+    background: var(--border-color);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     overflow: hidden;
 }
