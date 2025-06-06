@@ -39,7 +39,7 @@
 
 /* Стили для формы запроса */
 .dark-theme #requestForm {
-    background-color: rgba(70, 70, 70, 0.9);
+    background-color: var(--border-color);
     border: 2px solid var(--border-color);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
