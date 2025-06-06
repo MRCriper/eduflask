@@ -192,6 +192,26 @@
     color: var(--text-light);
 }
 
+.dark-theme .verification-result .correct {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.dark-theme .verification-result .incorrect {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #F44336;
+    border: 1px solid #F44336;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    margin-top: 10px;
+    font-weight: bold;
+}
+
 /* Стили для модального окна просмотра изображений */
 .dark-theme .modal-image-preview {
     background-color: rgba(60, 60, 60, 0.9) !important;
