@@ -1163,6 +1163,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Инициализируем тему
     initTheme();
+
+    // Инициализируем ударный режим
+    initStreak();
     
     document.querySelector('.account img')?.addEventListener('click', function() {
         window.location.href = '/account';
