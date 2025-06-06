@@ -70,7 +70,7 @@ function showStreakCalendar() {
     // Создаем контейнер для календаря
     const calendarContainer = document.createElement('div');
     calendarContainer.className = 'calendar-container';
-    calendarContainer.style.backgroundColor = 'white';
+    // Удаляем инлайн-стиль для backgroundColor, чтобы использовать CSS
     calendarContainer.style.borderRadius = '10px';
     calendarContainer.style.padding = '20px';
     calendarContainer.style.maxWidth = '90%';
