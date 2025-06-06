@@ -114,6 +114,57 @@ body {
     font-style: normal;
 }
 
+/* Стили для кнопки ударного режима */
+.streak-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    position: absolute;
+    right: 120px;
+    top: 20px;
+}
+
+.streak-toggle:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.streak-toggle:active {
+    transform: scale(0.95);
+}
+
+.streak-icon {
+    font-style: normal;
+    position: relative;
+}
+
+.streak-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
 .account .acc-img {
     width: 48px;
     height: 48px;

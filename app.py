@@ -453,12 +453,45 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     stats = db.relationship('UserStats', backref='user', lazy=True)
+    streak_days = db.relationship('StreakDay', backref='user', lazy=True)
+    current_streak = db.Column(db.Integer, default=0)  # Текущая серия дней
+    max_streak = db.Column(db.Integer, default=0)  # Максимальная серия дней
+    last_streak_date = db.Column(db.Date, nullable=True)  # Последняя дата активности
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     first_login = db.Column(db.Boolean, default=True)  # Флаг первого входа
     
     # Метод для получения активной задачи пользователя
     def get_active_task(self):
         return Task.query.filter_by(user_id=self.id, is_active=True).first()
+    
+    # Метод для обновления ударного режима
+    def update_streak(self, db_session):
+        today = datetime.now().date()
+        
+        # Если это первое решение или прошло больше 2 дней с последнего решения, сбрасываем серию
+        if not self.last_streak_date or (today - self.last_streak_date).days > 1:
+            self.current_streak = 1
+        # Если последнее решение было вчера, увеличиваем серию
+        elif (today - self.last_streak_date).days == 1:
+            self.current_streak += 1
+        # Если решение было сегодня, ничего не меняем
+        
+        # Обновляем максимальную серию, если текущая больше
+        if self.current_streak > self.max_streak:
+            self.max_streak = self.current_streak
+        
+        # Обновляем дату последнего решения
+        self.last_streak_date = today
+        
+        # Добавляем или обновляем запись для текущего дня
+        streak_day = db_session.query(StreakDay).filter_by(
+            user_id=self.id,
+            date=today
+        ).first()
+        
+        if not streak_day:
+            streak_day = StreakDay(user_id=self.id, date=today)
+            db_session.add(streak_day)
 
 
 class UserStats(db.Model):
@@ -485,6 +518,16 @@ class Task(db.Model):
     
     # Связь с пользователем
     user = db.relationship('User', backref=db.backref('tasks', lazy=True))
+
+
+class StreakDay(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Уникальное ограничение для пары user_id и date
+    __table_args__ = (db.UniqueConstraint('user_id', 'date', name='_user_date_uc'),)
 
 
 # Создаем таблицу (если её нет)
@@ -631,6 +674,32 @@ def check_first_login():
     except Exception as e:
         logger.error(f"Ошибка при проверке первого входа: {str(e)}")
         return jsonify({'is_first_login': False, 'error': str(e)})
+    finally:
+        db_session.close()
+
+@app.route('/get_streak_data')
+@login_required
+def get_streak_data():
+    db_session = Session(db.engine)
+    try:
+        user = db_session.get(User, session['user_id'])
+        if not user:
+            return jsonify({'success': False, 'message': 'Пользователь не найден'})
+        
+        # Получаем все дни активности пользователя
+        streak_days = db_session.query(StreakDay.date).filter_by(user_id=user.id).all()
+        active_days = [day[0].isoformat() for day in streak_days]
+        
+        return jsonify({
+            'success': True,
+            'current_streak': user.current_streak,
+            'max_streak': user.max_streak,
+            'active_days': active_days,
+            'last_streak_date': user.last_streak_date.isoformat() if user.last_streak_date else None
+        })
+    except Exception as e:
+        logger.error(f"Ошибка при получении данных об ударном режиме: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)})
     finally:
         db_session.close()
 
@@ -958,6 +1027,14 @@ def student():
                                 task.hints.split("\n"),
                                 task_files  # Передаем файлы задачи
                             )
+                            
+                            # Если решение правильное, обновляем ударный режим
+                            user = None
+                            if is_correct:
+                                user = db_session.get(User, session['user_id'])
+                                if user:
+                                    user.update_streak(db_session)
+                                    db_session.commit()
 
                             return jsonify({
                                 "type": "verification",
@@ -967,7 +1044,11 @@ def student():
                                 "hints": task.hints.split("\n"),
                                 "task_html": task.html_output,
                                 "task_files":
-                                task_files  # Добавляем HTML задачи для повторного отображения
+                                task_files,  # Добавляем HTML задачи для повторного отображения
+                                "streak": {
+                                    "current": user.current_streak if user and is_correct else 0,
+                                    "max": user.max_streak if user and is_correct else 0
+                                }
                             })
 
                     except Exception as e:

@@ -1,4 +1,4 @@
-from app import app, db, Task, User
+from app import app, db, Task, User, StreakDay
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Text, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -31,9 +31,19 @@ def migrate_database():
             new_user_columns = []
             if 'first_login' not in user_columns:
                 new_user_columns.append('first_login')
+            if 'current_streak' not in user_columns:
+                new_user_columns.append('current_streak')
+            if 'max_streak' not in user_columns:
+                new_user_columns.append('max_streak')
+            if 'last_streak_date' not in user_columns:
+                new_user_columns.append('last_streak_date')
             
-            if not new_task_columns and not new_user_columns:
-                logger.info("Все необходимые колонки уже существуют в таблицах")
+            # Проверяем, существует ли таблица StreakDay
+            tables = inspector.get_table_names()
+            need_streak_day_table = 'streak_day' not in tables
+            
+            if not new_task_columns and not new_user_columns and not need_streak_day_table:
+                logger.info("Все необходимые колонки и таблицы уже существуют")
                 return
             
             # Добавляем новые колонки
@@ -57,6 +67,29 @@ def migrate_database():
                         if column == 'first_login':
                             conn.execute(text('ALTER TABLE user ADD COLUMN first_login BOOLEAN DEFAULT TRUE'))
                             logger.info("Добавлена колонка first_login в таблицу User")
+                        elif column == 'current_streak':
+                            conn.execute(text('ALTER TABLE user ADD COLUMN current_streak INTEGER DEFAULT 0'))
+                            logger.info("Добавлена колонка current_streak в таблицу User")
+                        elif column == 'max_streak':
+                            conn.execute(text('ALTER TABLE user ADD COLUMN max_streak INTEGER DEFAULT 0'))
+                            logger.info("Добавлена колонка max_streak в таблицу User")
+                        elif column == 'last_streak_date':
+                            conn.execute(text('ALTER TABLE user ADD COLUMN last_streak_date DATE'))
+                            logger.info("Добавлена колонка last_streak_date в таблицу User")
+                    
+                    # Создаем таблицу StreakDay, если она не существует
+                    if need_streak_day_table:
+                        conn.execute(text('''
+                            CREATE TABLE streak_day (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                user_id INTEGER NOT NULL,
+                                date DATE NOT NULL,
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                FOREIGN KEY (user_id) REFERENCES user (id),
+                                UNIQUE (user_id, date)
+                            )
+                        '''))
+                        logger.info("Создана таблица streak_day")
                     
                     # Транзакция автоматически завершится при выходе из блока with
             
@@ -73,10 +106,15 @@ def migrate_database():
                     task.subject = "Другое"
             
             # Устанавливаем значение first_login для всех пользователей
-            if 'first_login' in new_user_columns:
+            if any(col in new_user_columns for col in ['first_login', 'current_streak', 'max_streak', 'last_streak_date']):
                 users = db.session.query(User).all()
                 for user in users:
-                    user.first_login = True
+                    if 'first_login' in new_user_columns:
+                        user.first_login = True
+                    if 'current_streak' in new_user_columns:
+                        user.current_streak = 0
+                    if 'max_streak' in new_user_columns:
+                        user.max_streak = 0
             
             db.session.commit()
             logger.info("Миграция базы данных успешно завершена")

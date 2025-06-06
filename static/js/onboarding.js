@@ -45,6 +45,13 @@ const Onboarding = {
             highlight: true
         },
         {
+            element: '.streak-toggle',
+            title: 'Ударный режим',
+            content: 'Здесь отображается ваша текущая серия правильно решенных задач. Нажмите, чтобы увидеть календарь активности.',
+            position: 'left',
+            highlight: true
+        },
+        {
             element: '.theme-toggle',
             title: 'Смена темы',
             content: 'Нажмите эту кнопку, чтобы переключиться между светлой и темной темой.',

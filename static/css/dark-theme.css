@@ -159,6 +159,22 @@
     border: none;
 }
 
+/* Стили для кнопки ударного режима в темной теме */
+.dark-theme .streak-toggle {
+    background: rgba(60, 60, 60, 0.9);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .streak-toggle:hover {
+    background: rgba(80, 80, 80, 0.9);
+    border-color: var(--primary-color);
+}
+
+.dark-theme .streak-count {
+    background-color: var(--primary-dark);
+}
+
 /* Стили для модального окна просмотра изображений */
 .dark-theme .modal-image-preview {
     background-color: rgba(60, 60, 60, 0.9) !important;

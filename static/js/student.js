@@ -1,4 +1,251 @@
 
+// Глобальные переменные для ударного режима
+let streakData = {
+    current_streak: 0,
+    max_streak: 0,
+    active_days: [],
+    last_streak_date: null
+};
+
+// Функция для инициализации ударного режима
+function initStreak() {
+    // Получаем данные об ударном режиме с сервера
+    fetchStreakData();
+    
+    // Добавляем обработчик события для кнопки ударного режима
+    const streakToggle = document.getElementById('streakToggle');
+    if (streakToggle) {
+        streakToggle.addEventListener('click', showStreakCalendar);
+    }
+}
+
+// Функция для получения данных об ударном режиме с сервера
+function fetchStreakData() {
+    fetch('/get_streak_data')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                streakData = {
+                    current_streak: data.current_streak,
+                    max_streak: data.max_streak,
+                    active_days: data.active_days,
+                    last_streak_date: data.last_streak_date
+                };
+                
+                // Обновляем счетчик ударного режима
+                updateStreakCounter();
+            } else {
+                console.error('Ошибка при получении данных об ударном режиме:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при запросе данных об ударном режиме:', error);
+        });
+}
+
+// Функция для обновления счетчика ударного режима
+function updateStreakCounter() {
+    const streakCount = document.querySelector('.streak-count');
+    if (streakCount) {
+        streakCount.textContent = streakData.current_streak;
+    }
+}
+
+// Функция для отображения календаря ударного режима
+function showStreakCalendar() {
+    // Создаем модальное окно для календаря
+    const modal = document.createElement('div');
+    modal.className = 'streak-calendar-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
+    
+    // Создаем контейнер для календаря
+    const calendarContainer = document.createElement('div');
+    calendarContainer.className = 'calendar-container';
+    calendarContainer.style.backgroundColor = 'white';
+    calendarContainer.style.borderRadius = '10px';
+    calendarContainer.style.padding = '20px';
+    calendarContainer.style.maxWidth = '90%';
+    calendarContainer.style.maxHeight = '90%';
+    calendarContainer.style.overflow = 'auto';
+    
+    // Добавляем заголовок
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '20px';
+    
+    const title = document.createElement('h2');
+    title.textContent = 'Ударный режим';
+    title.style.margin = '0';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.background = 'none';
+    closeBtn.style.border = 'none';
+    closeBtn.style.fontSize = '24px';
+    closeBtn.style.cursor = 'pointer';
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    calendarContainer.appendChild(header);
+    
+    // Добавляем информацию о текущей и максимальной серии
+    const streakInfo = document.createElement('div');
+    streakInfo.style.marginBottom = '20px';
+    streakInfo.innerHTML = `
+        <p>Текущая серия: <strong>${streakData.current_streak}</strong> дней</p>
+        <p>Максимальная серия: <strong>${streakData.max_streak}</strong> дней</p>
+    `;
+    calendarContainer.appendChild(streakInfo);
+    
+    // Создаем календарь
+    const calendar = createCalendar(streakData.active_days);
+    calendarContainer.appendChild(calendar);
+    
+    // Добавляем контейнер в модальное окно
+    modal.appendChild(calendarContainer);
+    
+    // Добавляем модальное окно в body
+    document.body.appendChild(modal);
+    
+    // Добавляем обработчик для закрытия модального окна
+    closeBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Закрытие модального окна при клике вне календаря
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+}
+
+// Функция для создания календаря
+function createCalendar(activeDays) {
+    const calendarEl = document.createElement('div');
+    calendarEl.className = 'calendar';
+    
+    // Получаем текущую дату
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    
+    // Создаем календарь на текущий месяц
+    const monthCalendar = createMonthCalendar(currentYear, currentMonth, activeDays);
+    calendarEl.appendChild(monthCalendar);
+    
+    return calendarEl;
+}
+
+// Функция для создания календаря на месяц
+function createMonthCalendar(year, month, activeDays) {
+    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    
+    const monthContainer = document.createElement('div');
+    monthContainer.className = 'month-calendar';
+    monthContainer.style.marginBottom = '20px';
+    
+    // Заголовок месяца
+    const monthHeader = document.createElement('h3');
+    monthHeader.textContent = `${monthNames[month]} ${year}`;
+    monthHeader.style.textAlign = 'center';
+    monthHeader.style.marginBottom = '10px';
+    monthContainer.appendChild(monthHeader);
+    
+    // Создаем таблицу для дней
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    
+    // Создаем заголовок таблицы с названиями дней недели
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    dayNames.forEach(day => {
+        const th = document.createElement('th');
+        th.textContent = day;
+        th.style.padding = '5px';
+        th.style.textAlign = 'center';
+        headerRow.appendChild(th);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Создаем тело таблицы с днями месяца
+    const tbody = document.createElement('tbody');
+    
+    // Получаем первый день месяца
+    const firstDay = new Date(year, month, 1);
+    // Получаем последний день месяца
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Определяем день недели первого дня месяца (0 - воскресенье, 1 - понедельник, и т.д.)
+    let firstDayOfWeek = firstDay.getDay();
+    // Преобразуем в формат, где понедельник - 0, воскресенье - 6
+    firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+    
+    // Создаем строки и ячейки для дней месяца
+    let date = 1;
+    for (let i = 0; i < 6; i++) {
+        // Создаем строку
+        const row = document.createElement('tr');
+        
+        // Создаем ячейки
+        for (let j = 0; j < 7; j++) {
+            const cell = document.createElement('td');
+            cell.style.padding = '5px';
+            cell.style.textAlign = 'center';
+            cell.style.width = '40px';
+            cell.style.height = '40px';
+            
+            // Добавляем дни только после первого дня месяца и до последнего дня месяца
+            if ((i === 0 && j < firstDayOfWeek) || date > lastDay.getDate()) {
+                cell.textContent = '';
+            } else {
+                cell.textContent = date;
+                
+                // Проверяем, является ли этот день активным
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                if (activeDays.includes(dateStr)) {
+                    cell.style.backgroundColor = '#4a6bff';
+                    cell.style.color = 'white';
+                    cell.style.borderRadius = '50%';
+                    cell.style.fontWeight = 'bold';
+                }
+                
+                date++;
+            }
+            
+            row.appendChild(cell);
+        }
+        
+        tbody.appendChild(row);
+        
+        // Если все дни месяца уже добавлены, выходим из цикла
+        if (date > lastDay.getDate()) {
+            break;
+        }
+    }
+    
+    table.appendChild(tbody);
+    monthContainer.appendChild(table);
+    
+    return monthContainer;
+}
+
 // Функции для работы с темной темой
 function initTheme() {
     // Проверяем, есть ли сохраненная тема

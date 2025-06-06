@@ -28,7 +28,11 @@ MathJax = {
         <div class="account">
             <img class="acc-img user-icon" src="{{ url_for('static', filename='img/user.png') }}" alt="account">
         </div>
-        <button class="theme-toggle" id="themeToggle">
+        <button class="streak-toggle" id="streakToggle" title="Ударный режим">
+            <i class="streak-icon">🔥</i>
+            <span class="streak-count">0</span>
+        </button>
+        <button class="theme-toggle" id="themeToggle" title="Сменить тему">
             <i class="theme-icon">🌙</i>
         </button>
     </div>
